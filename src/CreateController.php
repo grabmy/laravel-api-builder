@@ -72,6 +72,22 @@ class CreateController extends BaseBuilder
     $content .= "  \n";
 
     $content .= "  /**\n";
+    $content .= "   * Domains allowed for the API, \"*\" for everything.\n";
+    $content .= "   *\n";
+    $content .= "   * @var string\n";
+    $content .= "   */\n";
+    $content .= "  public \$allowedOrigin = \"*\";\n";
+    $content .= "  \n";
+
+    $content .= "  /**\n";
+    $content .= "   * Methods allowed for the API, \"*\" for everything.\n";
+    $content .= "   *\n";
+    $content .= "   * @var string\n";
+    $content .= "   */\n";
+    $content .= "  public \$allowedMethods = \"*\";\n";
+    $content .= "  \n";
+
+    $content .= "  /**\n";
     $content .= "   * Should fetch linked and listed entities in the body result of POST store.\n";
     $content .= "   *\n";
     $content .= "   * @var boolean\n";
@@ -103,7 +119,7 @@ class CreateController extends BaseBuilder
     $content .= "   */\n";
     $content .= "  public function index()\n";
     $content .= "  {\n";
-    $content .= "    return \$this->getFilteredAll(" . $phpName . "::all());\n";
+    $content .= "    return \$this->response(\$this->getFilteredAll(" . $phpName . "::all()));\n";
     $content .= "  }\n";
     $content .= "  \n";
     $content .= "  /**\n";
@@ -115,9 +131,9 @@ class CreateController extends BaseBuilder
     $content .= "    \n";
     $content .= "    if (\$entity) {\n";
     $content .= "      \$result = \$entity->fetch()->getFiltered();\n";
-    $content .= "      return response()->json(\$result, 200);\n";
+    $content .= "      return \$this->response(\$result, 200);\n";
     $content .= "    } else {\n";
-    $content .= "      return response()->json(null, 404);\n";
+    $content .= "      return \$this->response(null, 404);\n";
     $content .= "    }\n";
     $content .= "  }\n";
     $content .= "  \n";
@@ -133,7 +149,7 @@ class CreateController extends BaseBuilder
     $content .= "    \$errors = " . $phpName . "::validateFields(\$inputs);\n";
     $content .= "    \n";
     $content .= "    if (count(\$errors) > 0) {\n";
-    $content .= "      return response()->json(\$errors, 400);\n";
+    $content .= "      return \$this->response(\$errors, 400);\n";
     $content .= "    }\n";
     $content .= "    \n";
     $content .= "    try {\n";
@@ -142,9 +158,9 @@ class CreateController extends BaseBuilder
     $content .= "    } catch (\\Illuminate\\Database\\QueryException \$e) {\n";
     $content .= "      // Return the SQL error\n";
     $content .= "      if (config('app.APP_DEBUG') === false) {\n";
-    $content .= "        return response()->json(['type' => 'error-sql-query'], 400);\n";
+    $content .= "        return \$this->response(['type' => 'error-sql-query'], 400);\n";
     $content .= "      } else {\n";
-    $content .= "        return response()->json(['type' => 'error-sql-query', 'message' => \$e->getMessage()], 400);\n";
+    $content .= "        return \$this->response(['type' => 'error-sql-query', 'message' => \$e->getMessage()], 400);\n";
     $content .= "      }\n";
     $content .= "    }\n";
     $content .= "    \n";
@@ -153,7 +169,7 @@ class CreateController extends BaseBuilder
     $content .= "    }\n";
     $content .= "    \n";
     $content .= "    // Success\n";
-    $content .= "    return response()->json(\$entity, 201);\n";
+    $content .= "    return \$this->response(\$entity, 201);\n";
     $content .= "  }\n";
     $content .= "  \n";
     $content .= "  /**\n";
@@ -167,7 +183,7 @@ class CreateController extends BaseBuilder
     $content .= "    // Check for errors\n";
     $content .= "    \$errors = " . $phpName . "::validateFields(\$inputs);\n";
     $content .= "    if (count(\$errors) > 0) {\n";
-    $content .= "      return response()->json(\$errors, 400);\n";
+    $content .= "      return \$this->response(\$errors, 400);\n";
     $content .= "    }\n";
     $content .= "    \n";
     $content .= "    // Get the entity\n";
@@ -181,10 +197,10 @@ class CreateController extends BaseBuilder
     $content .= "      }\n";
     $content .= "      \n";
     $content .= "      // Return success\n";
-    $content .= "      return response()->json(\$result, 200);\n";
+    $content .= "      return \$this->response(\$result, 200);\n";
     $content .= "    } else {\n";
     $content .= "      // Entity not found\n";
-    $content .= "      return response()->json(null, 404);\n";
+    $content .= "      return \$this->response(null, 404);\n";
     $content .= "    }\n";
     $content .= "  }\n";
     $content .= "  \n";
@@ -198,10 +214,10 @@ class CreateController extends BaseBuilder
     $content .= "    \n";
     $content .= "    if (\$entity && \$entity->delete()) {\n";
     $content .= "      // Return success\n";
-    $content .= "      return response()->json(null, 204);\n";
+    $content .= "      return \$this->response(null, 204);\n";
     $content .= "    } else {\n";
     $content .= "      // Entity not found\n";
-    $content .= "      return response()->json(null, 404);\n";
+    $content .= "      return \$this->response(null, 404);\n";
     $content .= "    }\n";
     $content .= "  }\n";
     $content .= "  \n";

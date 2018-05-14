@@ -33,12 +33,12 @@ The artisan command is "make:api" and you must give the path of a JSON configura
 The optional verbose -v parameter can show more logs.
 
 ``` shell
-php artisan make:api ./boot.json -v
+php artisan make:api ./api.json -v
 ```
 
 ## Quick start
 
-Create a configuration file "boot.json" in the root folder of your Laravel project:
+Create a configuration file "api.json" in the root folder of your Laravel project:
 
 ``` JSON
 {
@@ -66,7 +66,7 @@ To boostrap your table migration and create all the files for the API in your pr
 > **WARNING**: If you already have a model, controller or migration file with the same filenames, the files will be overwritten.
 
 ``` shell
-php artisan make:api ./boot.json
+php artisan make:api ./api.json
 ```
 
 If everything works, you can see the files generated in green.
@@ -305,7 +305,7 @@ Return an error if the JSON don't have the correct type on POST creation and PUT
 
 The fetch feature is a powerfull feature that allows you to tell the API to fetch records or array of records from other tables.
 
-In the fetchable array:
+In the fetchable parameter:
 
 - Set a field value to true will fetch this field record and every records in it
 - Set a field value to false will only fetch the field record but not the records in it
@@ -383,9 +383,9 @@ Our article from the API becomes flat:
 }
 ```
 
-We don't see the "websites" field because it is not saved field in the database and we see now the "category_id" field which is not filtered out.
+We don't see the "websites" field because it is not saved field in the database, so it will be available only if the websites records are fetched. We see now the "category_id" field which is not filtered out.
 
-You can also set the fetchable parameter to just fetch "category" in our article and fetch everything in it but not fetching "websites". So the "tag_id" becomes a record as we can imagine it's a link to a tag table.
+You can also set the fetchable parameter to just fetch "category" in our article and fetch everything in it but not fetching "websites". So the "tag_id" the category record becomes a record as we can imagine it's a link to a tag table.
 
 ``` JSON
 {
@@ -414,7 +414,7 @@ The category is fetched and every field that can be fetched in it:
 }
 ```
 
-You can set the returned result you want and go as deep as you like without creating infinite loop.
+You can set the API result as you want and go as deep as you like without creating an infinite loop.
 Be aware that the more you fetch records from other tables, the slower your API will be, especially if you fetch in an array.
 
 ### Fetch POST and PUT option
@@ -423,6 +423,8 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ### Methods
 
+@TODO
+
 ## What this API generator doesn't do
 
 - Table with multiple fields as primary key
@@ -430,12 +432,15 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ## TODO
 
+- Save and restore database in JSON files
 - Add an error on wrong api methods
 - Add an error if "link" dont have an "as" option
+- Add type check for email, ip, url
+- Add field type json
+- Add where clause to list and link fields
 - Change migration, model, controller, api route path in config
 - Change namespace and class extends in config
 
 ## DONE
 
 - Make a default sort number for tables
-
