@@ -102,7 +102,7 @@ class BaseModel extends Model
 
   protected static function validateField(string $fieldName, $fieldValue, array $fieldOptions, $isUpdate = false) {
     $errors = [];
-
+    
     if (!$isUpdate && (isset($fieldOptions['unique']) || isset($fieldOptions['primary']))) {
       if (!self::validUnique($fieldName, $fieldValue)) {
         $errors[] = array(
@@ -220,7 +220,7 @@ class BaseModel extends Model
    * @return boolean
    */
   protected static function validMin($value, $min) {
-    if (is_string($value) && ($min <= 0 || strlen($value) >= $min)) {
+    if (is_string($value) && ($min <= 0 || mb_strlen($value) >= $min)) {
         return true;
     }
     if (is_numeric($value) && ($value >= $min)) {
@@ -278,7 +278,7 @@ class BaseModel extends Model
     if (is_null($value)) {
       return true;
     }
-    if (is_string($value) && strlen($value) <= $max) {
+    if (is_string($value) && mb_strlen($value) <= $max) {
       return true;
     }
     if (is_numeric($value) && $value <= $max) {

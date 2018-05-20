@@ -181,7 +181,7 @@ class CreateController extends BaseBuilder
     $content .= "    \$inputs = \$request->all();\n";
     $content .= "    \n";
     $content .= "    // Check for errors\n";
-    $content .= "    \$errors = " . $phpName . "::validateFields(\$inputs);\n";
+    $content .= "    \$errors = " . $phpName . "::validateFields(\$inputs, true);\n";
     $content .= "    if (count(\$errors) > 0) {\n";
     $content .= "      return \$this->response(\$errors, 400);\n";
     $content .= "    }\n";
