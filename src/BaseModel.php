@@ -355,8 +355,9 @@ class BaseModel extends Model
           $this->{$fieldOptions['as']} = $this->getLinked($fieldOptions['link'][0], $fieldOptions['link'][1], $this->{$fieldName}, $this->getFetchable($fieldOptions['as']));
         }
       } else if (isset($fieldOptions['list'])) {
-        if ($this->isFetchable('" . $fieldName . "')) {
-          $this->{$fieldName} = $this->getListed($fieldOptions['link'][0], $fieldOptions['link'][0], $this->{$this->primaryKey}, $this->getFetchable($fieldNam));
+        // var_dump($fieldName); die();
+        if ($this->isFetchable($fieldName)) {
+          $this->{$fieldName} = $this->getListed($fieldOptions['list'][0], $fieldOptions['list'][1], $this->{$this->primaryKey}, $this->getFetchable($fieldName));
         }
       }
     }
@@ -414,7 +415,7 @@ class BaseModel extends Model
     return $entity;
   }
 
-  private function getListed($class, $field, $value, $fetchable) {
+  private function getListed($table, $field, $value, $fetchable) {
     // nothing to be found if value is null
     if (is_null($value)) {
       return null;
