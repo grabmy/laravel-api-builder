@@ -350,14 +350,14 @@ class BaseModel extends Model
     }
 
     foreach ($this->fieldsData as $fieldName => $fieldOptions) {
-      if (isset($fieldOptions['link']) && isset($fieldOptions['as'])) {
+      if (isset($fieldOptions['one-to-one']) && isset($fieldOptions['as'])) {
         if ($this->isFetchable($fieldOptions['as'])) {
-          $this->{$fieldOptions['as']} = $this->getLinked($fieldOptions['link'][0], $fieldOptions['link'][1], $this->{$fieldName}, $this->getFetchable($fieldOptions['as']));
+          $this->{$fieldOptions['as']} = $this->getLinked($fieldOptions['one-to-one'][0], $fieldOptions['one-to-one'][1], $this->{$fieldName}, $this->getFetchable($fieldOptions['as']));
         }
-      } else if (isset($fieldOptions['list'])) {
+      } else if (isset($fieldOptions['one-to-many'])) {
         // var_dump($fieldName); die();
         if ($this->isFetchable($fieldName)) {
-          $this->{$fieldName} = $this->getListed($fieldOptions['list'][0], $fieldOptions['list'][1], $this->{$this->primaryKey}, $this->getFetchable($fieldName));
+          $this->{$fieldName} = $this->getListed($fieldOptions['one-to-many'][0], $fieldOptions['one-to-many'][1], $this->{$this->primaryKey}, $this->getFetchable($fieldName));
         }
       }
     }
@@ -379,12 +379,14 @@ class BaseModel extends Model
             $result[$fieldOptions['as']] = $result[$fieldOptions['as']]->getFiltered();
           }
         }
-      } else if (isset($fieldOptions['list'])) {
+      } else if (isset($fieldOptions['one-to-many'])) {
         if (isset($result[$fieldName])) {
           foreach ($result[$fieldName] as $entity) {
             $entity = $entity->getFiltered();
           }
         }
+      } else if (isset($fieldOptions['many-to-many'])) {
+        // @TODO
       }
     }
 

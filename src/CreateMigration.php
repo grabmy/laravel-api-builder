@@ -56,6 +56,18 @@ class CreateMigration extends BaseBuilder
   public function create() {
     $this->log('comment', '--------------------------------------------', 'v');
     $this->log('comment', 'Creating migration files', 'v');
+
+    $count_file_created = $this->createTables();
+
+    if ($count_file_created > 1) {
+      $this->log('comment', $count_file_created . ' files created', 'v');
+    } else {
+      $this->log('comment', $count_file_created . ' file created', 'v');
+    }
+
+  }
+
+  public function createTables() {
     $count_file_created = 0;
 
     foreach ($this->tables as $tableName => $table) {
@@ -83,15 +95,61 @@ class CreateMigration extends BaseBuilder
       } else {
         $this->log('comment', 'No constraint for table "' . $tableName . '"', 'v');
       }
+
+      // check for many-to-many field
+      $linkTables = [];
+      foreach ($table->getFields() as $field) {
+        if ($field->getType() == 'many-to-many') {
+          // add link table to array
+          $option = $field->getOption('many-to-many');
+          $sourceFieldName = $table->getName().'_id';
+          $sourceFieldOptions = $table->getPrimary()->getType().'|index';
+
+          $targetTable = $this->findTable($option[0]);
+          if (!$targetTable) {
+            $this->log('warning', 'Could not find table "' . $option[0] . '" in table definitions');
+            continue;
+          }
+
+          $targetPrimary = $targetTable->getPrimary();
+          if (!$targetPrimary) {
+            $this->log('warning', 'Could not find primary field of table "' . $option[0] . '" in table definitions');
+            continue;
+          }
+          $targetFieldName = $option[0] . '_id';
+          $targetFieldOptions = $targetPrimary->getType() . '|index';
+
+          $tableName = $table->getName() . '_' . $targetTable->getName() . '_link';
+          $tableOptions = array(
+            'fields' => array(
+              $sourceFieldName => $sourceFieldOptions,
+              $targetFieldName => $sourceFieldOptions,
+            ),
+            'order' => $table->getSort()
+          );
+          $this->log('comment', 'Adding table "' . $tableName . '" as a link table', 'v');
+          $linkTables[$tableName] = new BuilderTable($this->command, $tableName, $tableOptions);
+        }
+      }
+
+      if (count($linkTables) > 0) {
+        $this->log('comment', count($linkTables). ' additional tables to create', 'v');
+        $migration = new CreateMigration($this->command, $linkTables);
+        $count_file_created += $migration->createTables();
+      }
     }
 
-    if ($count_file_created > 1) {
-      $this->log('comment', $count_file_created . ' files created', 'v');
-    } else {
-      $this->log('comment', $count_file_created . ' file created', 'v');
-    }
+    return $count_file_created;
   }
 
+  private function findTable($name) {
+    foreach ($this->tables as $table) {
+      if ($table->getName() == $name) {
+        return $table;
+      }
+    }
+    return null;
+  }
 
   private function getMigrationContent(BuilderTable $table) {
     $phpName = $table->getPhpName();
@@ -158,7 +216,7 @@ class CreateMigration extends BaseBuilder
     $fields = $table->getFields();
 
     foreach ($fields as $fieldName => $field) {
-      if ($field->hasOption('link')) {
+      if ($field->hasOption('one-to-one')) {
         $countConstraint++;
       }
     }
@@ -186,8 +244,8 @@ class CreateMigration extends BaseBuilder
     $content .= "    Schema::table('".$tableName."', function (Blueprint \$table) {\n";
 
     foreach ($fields as $fieldName => $field) {
-      if ($field->hasOption('link')) {
-        $params = $field->getOption('link');
+      if ($field->hasOption('one-to-one')) {
+        $params = $field->getOption('one-to-one');
 
         if ($tableName != $params[0]) {
           if (!isset($params[1])) {
@@ -223,7 +281,7 @@ class CreateMigration extends BaseBuilder
    */
   public function getMigrationField(BuilderField $field) {
     $fieldType = $field->getType();
-    if ($fieldType == 'list') {
+    if ($fieldType == 'one-to-many' || $fieldType == 'many-to-many') {
       return '';
     }
 

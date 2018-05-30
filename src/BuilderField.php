@@ -15,7 +15,7 @@ class BuilderField extends BaseBuilder
   private $typeParams;
 
   /**
-   * Field type option list
+   * Field type list
    * 
    * uuid : UUID type, auto generated if the field is primary
    * string: String type with optional parameter length
@@ -29,7 +29,8 @@ class BuilderField extends BaseBuilder
    * desimal: Decimal type
    * bool: Boolean type
    * boolean: Boolean type
-   * list: get a list linked records from another table. The link option if set the other table. Corresponds to a relationship one-to-many
+   * one-to-many: get a list of linked records from another table. The "one-to-one" option field 
+   *   must be set in the definition of the other table. Corresponds to a relationship one-to-many
    *
    * @var array
    */
@@ -46,20 +47,23 @@ class BuilderField extends BaseBuilder
     // 'decimal' => ['mandatory' => 0, 'optional' => 0],
     'bool' => ['mandatory' => 0, 'optional' => 0],
     'boolean' => ['mandatory' => 0, 'optional' => 0],
-    'list' => ['mandatory' => 2, 'optional' => 0, 'list' => ['table', 'field']],
+    'one-to-many' => ['mandatory' => 2, 'optional' => 0, 'list' => ['table', 'field']],
+    'many-to-many' => ['mandatory' => 1, 'optional' => 0, 'list' => ['table']],
   ];
 
   /**
-   * Field normal option list
+   * Field option list
    * 
    * unique : Make the value unique @TODO check at model level if the value is unique in DB
    * default: Default value if created with Null or omitted
-   * min: Minimum value for integer or float, minimum length for string, minimum length for array, if not null
+   * min: Minimum value for integer or float, minimum length for string, minimum length for array, 
+   *   if not null
    * nullable: Field can be Null
    * primary: Field is a primary key, primary field is required and unique
    * required: Field must not be null or empty at creation and update
    * type: Check the type of the value if not null
-   * link: Create a linked field to bind a record from another table, as a foreign key. Corresponds to a relationship one-to-one
+   * one-to-one: Create a linked field to bind a record from another table, as a foreign key. 
+   *   Corresponds to a relationship one-to-one
    * as: For linked field, the foreign entity is retrieved in a variable by API and omitted
    * omit: Field is not returned by API
    * cascade: @TODO For linked field, cascade the deletion to the foreign table entry
@@ -75,7 +79,7 @@ class BuilderField extends BaseBuilder
     'primary' => ['mandatory' => 0, 'optional' => 0],
     'required' => ['mandatory' => 0, 'optional' => 0],
     'type' => ['mandatory' => 1, 'optional' => 0, 'list' => ['type']],
-    'link' => ['mandatory' => 2, 'optional' => 0, 'list' => ['table', 'field']],
+    'one-to-one' => ['mandatory' => 2, 'optional' => 0, 'list' => ['table', 'field']],
     'as' => ['mandatory' => 1, 'optional' => 0, 'list' =>['field']],
     'omit' => ['mandatory' => 0, 'optional' => 0],
     'index' => ['mandatory' => 0, 'optional' => 0],
