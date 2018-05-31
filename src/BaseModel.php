@@ -355,9 +355,12 @@ class BaseModel extends Model
           $this->{$fieldOptions['as']} = $this->getLinked($fieldOptions['one-to-one'][0], $fieldOptions['one-to-one'][1], $this->{$fieldName}, $this->getFetchable($fieldOptions['as']));
         }
       } else if (isset($fieldOptions['one-to-many'])) {
-        // var_dump($fieldName); die();
         if ($this->isFetchable($fieldName)) {
           $this->{$fieldName} = $this->getListed($fieldOptions['one-to-many'][0], $fieldOptions['one-to-many'][1], $this->{$this->primaryKey}, $this->getFetchable($fieldName));
+        }
+      } else if (isset($fieldOptions['many-to-many'])) {
+        if ($this->isFetchable($fieldName)) {
+          $this->{$fieldName} = $this->getMany($fieldOptions['many-to-many'][0], $fieldOptions['many-to-many'][1], $this->{$this->primaryKey}, $this->getFetchable($fieldName));
         }
       }
     }
@@ -442,10 +445,37 @@ class BaseModel extends Model
       $entity->fetchable = $fetchable;
       if ($fetchable !== false) {
         $entity->fetch();
-      }
-      $result[] = $entity;
+      }      $result[] = $entity;
     }
     return $list;
+  }
+
+  private function getMany($targetTable, $targetId, $value, $fetchable) {
+    // nothing to be found if value is null
+    if (is_null($value)) {
+      return null;
+    }
+
+    $linkTable = $this->table . '_' . $targetTable . '_link';
+    $linkSourceId = $this->table . '_id';
+    $linkTargetId = $targetTable . '_id';
+
+    return \DB::table($linkTable)
+      ->select($targetTable.'.*')
+      ->where($linkTable.'.'.$linkSourceId, '=', $value)
+      ->join($targetTable, $linkTable.'.'.$linkTargetId, '=', $targetTable.'.'.$targetId)
+      ->get();
+  }
+
+  public static function create($inputs) {
+    $entity = static::query()->create($inputs);
+    $entity->updateManyLink($inputs);
+
+    return $entity;
+  }
+
+  protected function updateManyLink($inputs) {
+    // @TODO
   }
 
 }

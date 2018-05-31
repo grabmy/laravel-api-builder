@@ -4,7 +4,11 @@ namespace Laravel\Api\Builder;
 
 class CreateModel extends BaseBuilder
 {
-
+  /**
+   * List of tables
+   *
+   * @var array BuilderTable
+   */
   private $tables;
 
   public static $baseDir = './app/';

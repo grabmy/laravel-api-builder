@@ -4,26 +4,74 @@ namespace Laravel\Api\Builder;
 
 class BuilderTable extends BaseBuilder
 {
-
+  /**
+   * Name of the table in database
+   *
+   * @var string
+   */
   private $tableName;
 
+  /**
+   * Complete table options array
+   *
+   * @var [type]
+   */
   private $tableOptions;
 
+  /**
+   * List of fields
+   *
+   * @var BuilderField
+   */
   private $fields;
 
+  /**
+   * Table API options array
+   *
+   * @var array
+   */
   private $api;
 
+  /**
+   * Primary field
+   *
+   * @var BuilderField
+   */
   private $primary;
 
+  /**
+   * List of omitted fields in API response
+   *
+   * @var array
+   */
   private $omitted;
 
+  /**
+   * List of indexed fields in table
+   *
+   * @var array
+   */
   private $indexed;
 
+  /**
+   * Sort number of the table
+   *
+   * @var integer
+   */
   private $sort = 0;
 
+  /**
+   * Constructor
+   *
+   * @param Command $command
+   * @param string $tableName
+   * @param array $tableOptions
+   * @param array $tables
+   */
   public function __construct($command, $tableName, $tableOptions) {
     parent::__construct($command);
     
+    // Initialisation
     $this->tableName = $tableName;
     $this->tableOptions = $tableOptions;
     $this->fields = [];
@@ -32,11 +80,13 @@ class BuilderTable extends BaseBuilder
     $this->omitted = [];
     $this->indexed = [];
     
+    // Stop if no field
     if (!is_array($tableOptions['fields']) || count($tableOptions['fields']) == 0) {
       $this->log('error', 'No fields in table "'.$tableName.'"');
       return;
     }
     
+    // Build the fields
     foreach ($tableOptions['fields'] as $fieldName => $fieldOptions) {
       $field = new BuilderField($this->command, $fieldName, $fieldOptions);
       if ($field->hasError()) {
@@ -53,11 +103,13 @@ class BuilderTable extends BaseBuilder
       }
     }
 
+    // Stop on error
     if (count($this->fields) == 0) {
       $this->log('error', 'No valid fields in table "'.$tableName.'"');
       return;
     }
 
+    // Initialisation of API
     if (isset($tableOptions['api'])) {
       $this->api = $tableOptions['api'];
       $this->api['prefix'] = isset($this->api['prefix']) ? $this->api['prefix'] : '';
@@ -66,6 +118,7 @@ class BuilderTable extends BaseBuilder
       $this->api['middleware'] = isset($this->api['middleware']) ? $this->api['middleware'] : 'api';
     }
 
+    // Set sort
     if (isset($tableOptions['sort'])) {
       $this->sort = intval($tableOptions['sort']);
     }
@@ -116,6 +169,27 @@ class BuilderTable extends BaseBuilder
           unset($options[$name]);
         }
       }
+
+      /*
+      if ($field->hasOption('many-to-many')) {
+        $target = null;
+        foreach($tables as $table) {
+          if ($table->getName() == $field->getOption('many-to-many')[0]) {
+            $target = $table;
+            break;
+          }
+        }
+        if (!$target) {
+          $this->log('warning', 'Warning in the model of the table "'.$this->getName().'"');
+          $this->log('warning', 'Reference to table "'.$field->getOption('many-to-many')[0].'" not found for field "'.$field->getName().'" option "many-to-many"');
+          continue;
+        }
+
+        $linkTable = $this->getName().'_'.$target->getName().'_link';
+
+        
+      }
+      */
       $result[$fieldName] = $options;
     }
 
