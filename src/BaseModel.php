@@ -360,7 +360,7 @@ class BaseModel extends Model
         }
       } else if (isset($fieldOptions['many-to-many'])) {
         if ($this->isFetchable($fieldName)) {
-          $this->{$fieldName} = $this->getMany($fieldOptions['many-to-many'][0], $fieldOptions['many-to-many'][1], $this->{$this->primaryKey}, $this->getFetchable($fieldName));
+          $this->{$fieldName} = $this->getManyToMany($fieldOptions['many-to-many'][0], $fieldOptions['many-to-many'][1], $this->{$this->primaryKey}, $this->getFetchable($fieldName));
         }
       }
     }
@@ -388,8 +388,6 @@ class BaseModel extends Model
             $entity = $entity->getFiltered();
           }
         }
-      } else if (isset($fieldOptions['many-to-many'])) {
-        // @TODO
       }
     }
 
@@ -450,33 +448,105 @@ class BaseModel extends Model
     return $list;
   }
 
-  private function getMany($targetTable, $targetId, $value, $fetchable) {
+  private function getManyToMany($targetTable, $targetField, $sourceValue, $fetchable) {
     // nothing to be found if value is null
-    if (is_null($value)) {
+    if (is_null($sourceValue)) {
       return null;
     }
 
     $linkTable = $this->table . '_' . $targetTable . '_link';
-    $linkSourceId = $this->table . '_id';
-    $linkTargetId = $targetTable . '_id';
+    $linkSourceField = $this->table . '_id';
+    $linkTargetField = $targetTable . '_id';
 
     return \DB::table($linkTable)
       ->select($targetTable.'.*')
-      ->where($linkTable.'.'.$linkSourceId, '=', $value)
-      ->join($targetTable, $linkTable.'.'.$linkTargetId, '=', $targetTable.'.'.$targetId)
+      ->where($linkTable.'.'.$linkSourceField, '=', $sourceValue)
+      ->join($targetTable, $linkTable.'.'.$linkTargetField, '=', $targetTable.'.'.$targetField)
       ->get();
   }
 
+  private function clearManyToMany($targetTable, $sourceValue) {
+    // nothing to be found if value is null
+    if (is_null($sourceValue)) {
+      return null;
+    }
+
+    $linkTable = $this->table . '_' . $targetTable . '_link';
+    $linkSourceField = $this->table . '_id';
+
+    return \DB::table($linkTable)
+      ->where($linkSourceField, '=', $sourceValue)
+      ->delete();
+  }
+
+  private function insertManyToMany($fieldName, $targetTable, $targetField, $targetValue, $sourceValue) {
+    // nothing to be found if value is null
+    if (is_null($sourceValue)) {
+      return null;
+    }
+
+    if (is_null($targetValue) || empty($targetValue)) {
+      return null;
+    }
+
+    $linkTable = $this->table . '_' . $targetTable . '_link';
+    $linkSourceField = $this->table . '_id';
+    $linkTargetField = $targetTable . '_id';
+
+    \DB::table($linkTable)
+      ->insert(array(
+        $linkSourceField => $sourceValue,
+        $linkTargetField => $targetValue
+      ));
+    
+    if (!isset($this->{$fieldName})) {
+      $this->{$fieldName} = [];
+    }
+
+    $array = $this->{$fieldName};
+    array_push($array, \DB::table($targetTable)->where($targetField, '=', $targetValue)->first());
+    $this->{$fieldName} = $array;
+  }
+
+  protected function updateMany($inputs) {
+    foreach ($this->fieldsData as $fieldName => $fieldOptions) {
+      if (isset($fieldOptions['many-to-many'])) {
+        $this->clearManyToMany($fieldOptions['many-to-many'][0], $this->{$this->primaryKey});
+
+        if (isset($inputs[$fieldName]) && count($inputs[$fieldName]) > 0) {
+          foreach ($inputs[$fieldName] as $targetValue) {
+            $this->insertManyToMany($fieldName, $fieldOptions['many-to-many'][0], $fieldOptions['many-to-many'][1], $targetValue, $this->{$this->primaryKey});
+          }
+        }
+      }
+    }
+  }
+
   public static function create($inputs) {
-    $entity = static::query()->create($inputs);
-    $entity->updateManyLink($inputs);
+    $inputsData = $inputs;
+    $fieldsData = self::staticGetFieldsData();
+    foreach ($fieldsData as $fieldName => $fieldOptions) {
+      if (isset($fieldOptions['many-to-many']) || isset($fieldOptions['one-to-many'])) {
+        unset($inputsData[$fieldName]);
+      }
+    }
+    $entity = static::query()->create($inputsData);
+    $entity->updateMany($inputs);
 
     return $entity;
   }
-
-  protected function updateManyLink($inputs) {
-    // @TODO
+  
+  public function update(array $attributes = [], array $options = []) {
+    $inputsData = $attributes;
+    foreach ($this->fieldsData as $fieldName => $fieldOptions) {
+      if (isset($fieldOptions['many-to-many']) || isset($fieldOptions['one-to-many'])) {
+        unset($inputsData[$fieldName]);
+      }
+    }
+    $success = parent::update($inputsData, $options);
+    $this->updateMany($attributes);
+    return $success;
   }
-
+  
 }
 
