@@ -47,6 +47,7 @@ class BuilderField extends BaseBuilder
     // 'decimal' => ['mandatory' => 0, 'optional' => 0],
     'bool' => ['mandatory' => 0, 'optional' => 0],
     'boolean' => ['mandatory' => 0, 'optional' => 0],
+    'json' => ['mandatory' => 0, 'optional' => 0],
     'one-to-many' => ['mandatory' => 2, 'optional' => 0, 'list' => ['table', 'field']],
     'many-to-many' => ['mandatory' => 2, 'optional' => 0, 'list' => ['table', 'field']],
   ];

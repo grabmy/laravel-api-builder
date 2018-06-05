@@ -47,24 +47,88 @@ class BaseModel extends Model
   public static function boot()
   {
     parent::boot();
+
+    self::retrieved(function ($model) {
+      foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
+        $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+      }
+    });
+
     self::creating(function ($model) {
-      $values = self::initFields();
+      $values = self::defaultFieldsData();
       foreach ($values as $fieldName => $fieldValue) {
-        $model->setAttribute($fieldName, $fieldValue);
+        $model->setAttribute($fieldName, self::decodeField($fieldName, $fieldValue));
+      }
+    });
+
+    self::created(function ($model) {
+      foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
+        $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+      }
+    });
+
+    self::updated(function ($model) {
+      foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
+        $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
       }
     });
   }
 
-  public static function initFields() {
+  public static function defaultFieldsData() {
     $values = [];
-    $options = self::staticGetFieldsData();
-    foreach ($options as $fieldName => $fieldOptions) {
+    $fieldsDefinition = self::staticGetFieldsDefinition();
+    foreach ($fieldsDefinition as $fieldName => $fieldOptions) {
       $newValue = self::initField($fieldName, $fieldOptions);
       if (!is_null($newValue)) {
         $values[$fieldName] = $newValue;
       }
+      if (isset($fieldOptions['json']) && isset($values[$fieldName]) && $values[$fieldName] != '') {
+        $values[$fieldName] = json_encode($values[$fieldName]);
+      }
     }
     return $values;
+  }
+
+  /**
+   * Tranform field to be used in API
+   * json: from "[1,\"test\"]" to [1, "test"]
+   *
+   * @param string $name
+   * @param mixed $value
+   * @return mixed
+   */
+  public static function encodeField($name, $value) {
+    $fieldsDefinition = self::staticGetFieldsDefinition();
+    if (!isset($fieldsDefinition[$name])) {
+      return $value;
+    }
+    if (isset($fieldsDefinition[$name]['json'])) {
+      if (!empty($value) && trim($value) != "") {
+        $value = json_decode($value);
+      }
+    }
+    return $value;
+  }
+
+  /**
+   * Tranform field to be recorded in database
+   * json: from [1, "test"] to "[1,\"test\"]"
+   *
+   * @param string $name
+   * @param mixed $value
+   * @return mixed
+   */
+  public static function decodeField($name, $value) {
+    $fieldsDefinition = self::staticGetFieldsDefinition();
+    if (!isset($fieldsDefinition[$name])) {
+      return $value;
+    }
+    if (isset($fieldsDefinition[$name]['json'])) {
+      if (!empty($value) && trim($value) != "") {
+        $value = json_encode($value);
+      }
+    }
+    return $value;
   }
 
   protected static function initField(string $fieldName, array $fieldOptions) {
@@ -83,7 +147,7 @@ class BaseModel extends Model
    * @return void
    */
   protected static function validateFields(array $values, $isUpdate = false) {
-    $fields = self::staticGetFieldsData();
+    $fields = self::staticGetFieldsDefinition();
     $fillable = self::staticGetFillable();
     $errors = [];
 
@@ -349,7 +413,7 @@ class BaseModel extends Model
       return $this;
     }
 
-    foreach ($this->fieldsData as $fieldName => $fieldOptions) {
+    foreach ($this->fieldsDefinition as $fieldName => $fieldOptions) {
       if (isset($fieldOptions['one-to-one']) && isset($fieldOptions['as'])) {
         if ($this->isFetchable($fieldOptions['as'])) {
           $this->{$fieldOptions['as']} = $this->getLinked($fieldOptions['one-to-one'][0], $fieldOptions['one-to-one'][1], $this->{$fieldName}, $this->getFetchable($fieldOptions['as']));
@@ -371,7 +435,7 @@ class BaseModel extends Model
   public function getFiltered() {
     $result = $this->toArray();
 
-    foreach ($this->fieldsData as $fieldName => $fieldOptions) {
+    foreach ($this->fieldsDefinition as $fieldName => $fieldOptions) {
       if (isset($fieldOptions['omit'])) {
         unset($result[$fieldName]);
       }
@@ -509,7 +573,7 @@ class BaseModel extends Model
   }
 
   protected function updateMany($inputs) {
-    foreach ($this->fieldsData as $fieldName => $fieldOptions) {
+    foreach ($this->fieldsDefinition as $fieldName => $fieldOptions) {
       if (isset($fieldOptions['many-to-many'])) {
         $this->clearManyToMany($fieldOptions['many-to-many'][0], $this->{$this->primaryKey});
 
@@ -524,10 +588,12 @@ class BaseModel extends Model
 
   public static function create($inputs) {
     $inputsData = $inputs;
-    $fieldsData = self::staticGetFieldsData();
-    foreach ($fieldsData as $fieldName => $fieldOptions) {
+    $fieldsDefinition = self::staticGetFieldsDefinition();
+    foreach ($fieldsDefinition as $fieldName => $fieldOptions) {
       if (isset($fieldOptions['many-to-many']) || isset($fieldOptions['one-to-many'])) {
         unset($inputsData[$fieldName]);
+      } else if (isset($fieldOptions['json'])) {
+        $inputsData[$fieldName] = json_encode($inputsData[$fieldName]);
       }
     }
     $entity = static::query()->create($inputsData);
@@ -538,9 +604,11 @@ class BaseModel extends Model
   
   public function update(array $attributes = [], array $options = []) {
     $inputsData = $attributes;
-    foreach ($this->fieldsData as $fieldName => $fieldOptions) {
+    foreach ($this->fieldsDefinition as $fieldName => $fieldOptions) {
       if (isset($fieldOptions['many-to-many']) || isset($fieldOptions['one-to-many'])) {
         unset($inputsData[$fieldName]);
+      } else if (isset($fieldOptions['json'])) {
+        $inputsData[$fieldName] = json_encode($inputsData[$fieldName]);
       }
     }
     $success = parent::update($inputsData, $options);

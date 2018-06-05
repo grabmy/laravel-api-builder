@@ -58,7 +58,7 @@ class CreateModel extends BaseBuilder
     $phpName = $table->getPhpName();
     $fields = $table->getFields();
     $api = $table->getApi();
-    $fieldsData = $table->getFieldsArray();
+    $fieldsDefinition = $table->getFieldsArray();
 
     $content = "<?php\n";
     $content .= "\n";
@@ -130,10 +130,10 @@ class CreateModel extends BaseBuilder
     $content .= "   * @var array\n";
     $content .= "   */\n";
 
-    if (isset($fieldsData) && count($fieldsData) > 0) {
-      $content .= "  public \$fieldsData = " . var_export($fieldsData, true) . ";\n";
+    if (isset($fieldsDefinition) && count($fieldsDefinition) > 0) {
+      $content .= "  public \$fieldsDefinition = " . var_export($fieldsDefinition, true) . ";\n";
     } else {
-      $content .= "  public \$fieldsData = [];\n";
+      $content .= "  public \$fieldsDefinition = [];\n";
     }
     $content .= "  \n";
 
@@ -149,9 +149,9 @@ class CreateModel extends BaseBuilder
     }
     $content .= "  \n";
 
-    $content .= "  public static function staticGetFieldsData() {\n";
+    $content .= "  public static function staticGetFieldsDefinition() {\n";
     $content .= "    \$entity = new self();\n";
-    $content .= "    return \$entity->fieldsData;\n";
+    $content .= "    return \$entity->fieldsDefinition;\n";
     $content .= "  }\n";
     $content .= "  \n";
     $content .= "  public static function staticGetFillable() {\n";
