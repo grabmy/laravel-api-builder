@@ -572,7 +572,7 @@ class BaseModel extends Model
     $this->{$fieldName} = $array;
   }
 
-  protected function updateMany($inputs) {
+  protected function updateManyToMany($inputs) {
     foreach ($this->fieldsDefinition as $fieldName => $fieldOptions) {
       if (isset($fieldOptions['many-to-many'])) {
         $this->clearManyToMany($fieldOptions['many-to-many'][0], $this->{$this->primaryKey});
@@ -597,7 +597,7 @@ class BaseModel extends Model
       }
     }
     $entity = static::query()->create($inputsData);
-    $entity->updateMany($inputs);
+    $entity->updateManyToMany($inputs);
 
     return $entity;
   }
@@ -611,8 +611,10 @@ class BaseModel extends Model
         $inputsData[$fieldName] = json_encode($inputsData[$fieldName]);
       }
     }
+    var_dump('inputsData', $inputsData, $options); //die();
     $success = parent::update($inputsData, $options);
-    $this->updateMany($attributes);
+    die();
+    $this->updateManyToMany($attributes);
     return $success;
   }
   

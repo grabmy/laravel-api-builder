@@ -33,6 +33,13 @@ class BuilderTable extends BaseBuilder
   private $api;
 
   /**
+   * Hook function string
+   *
+   * @var array
+   */
+  private $hook;
+
+  /**
    * Primary field
    *
    * @var BuilderField
@@ -118,10 +125,23 @@ class BuilderTable extends BaseBuilder
       $this->api['middleware'] = isset($this->api['middleware']) ? $this->api['middleware'] : 'api';
     }
 
+    // Initialisation of hook
+    if (isset($tableOptions['hook'])) {
+      $this->hook = $tableOptions['hook'];
+    }
+
     // Set sort
     if (isset($tableOptions['sort'])) {
       $this->sort = intval($tableOptions['sort']);
     }
+  }
+
+  public function hasHook() {
+    return isset($this->hook);
+  }
+
+  public function getHook() {
+    return $this->hook;
   }
 
   public function getSort() {
@@ -210,10 +230,13 @@ class BuilderTable extends BaseBuilder
   public function getFillable() {
     $fillable = [];
     foreach ($this->fields as $fieldName => $field) {
-      if (isset($options['increments'])) {
+      if ($field->hasOption('increments')) {
         continue;
       }
-      if (isset($options['uuid']) && isset($options['primary'])) {
+      if ($field->hasOption('many-to-many') || $field->hasOption('one-to-many')) {
+        continue;
+      }
+      if ($field->hasOption('uuid') && $field->hasOption('primary')) {
         continue;
       }
       $fillable[] = $fieldName;

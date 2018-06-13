@@ -131,6 +131,9 @@ class CreateController extends BaseBuilder
     $content .= "    \n";
     $content .= "    if (\$entity) {\n";
     $content .= "      \$result = \$entity->fetch()->getFiltered();\n";
+    if ($table->hasHook()) {
+      $content .= "      \$result = ".$table->getHook()."('get', \$id, \$result);\n";
+    }
     $content .= "      return \$this->response(\$result, 200);\n";
     $content .= "    } else {\n";
     $content .= "      return \$this->response(null, 404);\n";
@@ -158,15 +161,18 @@ class CreateController extends BaseBuilder
     $content .= "    } catch (\\Illuminate\\Database\\QueryException \$e) {\n";
     $content .= "      // Return the SQL error\n";
     $content .= "      if (config('app.APP_DEBUG') === false) {\n";
-    $content .= "        return \$this->response(['type' => 'error-sql-query'], 400);\n";
+    $content .= "        return \$this->response(['type' => 'error-sql-query'], 500);\n";
     $content .= "      } else {\n";
-    $content .= "        return \$this->response(['type' => 'error-sql-query', 'message' => \$e->getMessage()], 400);\n";
+    $content .= "        return \$this->response(['type' => 'error-sql-query', 'message' => \$e->getMessage()], 500);\n";
     $content .= "      }\n";
     $content .= "    }\n";
     $content .= "    \n";
     $content .= "    if (\$this->fetchOnStore) {\n";
     $content .= "      \$entity = \$entity->fetch()->getFiltered();\n";
     $content .= "    }\n";
+    if ($table->hasHook()) {
+      $content .= "    \$entity = ".$table->getHook()."('create', \$inputs, \$entity);\n";
+    }
     $content .= "    \n";
     $content .= "    // Success\n";
     $content .= "    return \$this->response(\$entity, 201);\n";
@@ -196,6 +202,9 @@ class CreateController extends BaseBuilder
     $content .= "        \$result = \$entity->getFiltered();\n";
     $content .= "      }\n";
     $content .= "      \n";
+    if ($table->hasHook()) {
+      $content .= "      \$result = ".$table->getHook()."('update', \$inputs, \$result);\n";
+    }
     $content .= "      // Return success\n";
     $content .= "      return \$this->response(\$result, 200);\n";
     $content .= "    } else {\n";
@@ -213,6 +222,9 @@ class CreateController extends BaseBuilder
     $content .= "    \$entity = " . $phpName . "::find(\$id);\n";
     $content .= "    \n";
     $content .= "    if (\$entity && \$entity->delete()) {\n";
+    if ($table->hasHook()) {
+      $content .= "      \$entity = ".$table->getHook()."('delete', \$id, \$entity);\n";
+    }
     $content .= "      // Return success\n";
     $content .= "      return \$this->response(null, 204);\n";
     $content .= "    } else {\n";
