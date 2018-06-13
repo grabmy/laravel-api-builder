@@ -50,26 +50,34 @@ class BaseModel extends Model
 
     self::retrieved(function ($model) {
       foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
-        $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+        if ($model->isFillable($fieldName)) {
+          $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+        }
       }
     });
 
     self::creating(function ($model) {
       $values = self::defaultFieldsData();
       foreach ($values as $fieldName => $fieldValue) {
-        $model->setAttribute($fieldName, self::decodeField($fieldName, $fieldValue));
+        if ($model->isFillable($fieldName)) {
+          $model->setAttribute($fieldName, self::decodeField($fieldName, $fieldValue));
+        }
       }
     });
 
     self::created(function ($model) {
       foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
-        $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+        if ($model->isFillable($fieldName)) {
+          $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+        }
       }
     });
 
     self::updated(function ($model) {
       foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
-        $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+        if ($model->isFillable($fieldName)) {
+          $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+        }
       }
     });
   }
@@ -611,9 +619,9 @@ class BaseModel extends Model
         $inputsData[$fieldName] = json_encode($inputsData[$fieldName]);
       }
     }
-    var_dump('inputsData', $inputsData, $options); //die();
+
     $success = parent::update($inputsData, $options);
-    die();
+
     $this->updateManyToMany($attributes);
     return $success;
   }

@@ -236,9 +236,11 @@ class BuilderTable extends BaseBuilder
       if ($field->hasOption('many-to-many') || $field->hasOption('one-to-many')) {
         continue;
       }
+      /*
       if ($field->hasOption('uuid') && $field->hasOption('primary')) {
         continue;
       }
+      */
       $fillable[] = $fieldName;
     }
     return $fillable;
