@@ -67,7 +67,7 @@ class BuilderField extends BaseBuilder
    *   Corresponds to a relationship one-to-one
    * as: For linked field, the foreign entity is retrieved in a variable by API and omitted
    * omit: Field is not returned by API
-   * cascade: @TODO For linked field, cascade the deletion to the foreign table entry
+   * cascade: @TODO For linked field, cascade the deletion to the foreign table entry (entity and/or link)
    *
    * @var array
    */
@@ -81,9 +81,10 @@ class BuilderField extends BaseBuilder
     'required' => ['mandatory' => 0, 'optional' => 0],
     'type' => ['mandatory' => 1, 'optional' => 0, 'list' => ['type']],
     'one-to-one' => ['mandatory' => 2, 'optional' => 0, 'list' => ['table', 'field']],
-    'as' => ['mandatory' => 1, 'optional' => 0, 'list' =>['field']],
+    'as' => ['mandatory' => 1, 'optional' => 0, 'list' => ['field']],
     'omit' => ['mandatory' => 0, 'optional' => 0],
     'index' => ['mandatory' => 0, 'optional' => 0],
+    'cascade' => ['mandatory' => 0, 'optional' => 1, 'list' => ['type']],
   ];
 
 

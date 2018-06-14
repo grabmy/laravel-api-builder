@@ -233,16 +233,17 @@ Body:
 
 ## Field types
 
-| Type       | Description                          | Parameters
-| ---------- | ------------------------------------ | ---------------
-| string     | Just a string                        | optional length
-| text       | Long text                            |
-| int        | Integer                              |
-| bool       | Boolean                              |
-| float      | A float number                       |
-| uuid       | An UUID                              |
-| increments | An incrementing integer              |
-| list       | A list of records from another table | Table, field
+| Type         | Description                          | Parameters
+| ------------ | ------------------------------------ | ---------------
+| string       | Just a string                        | optional length
+| text         | Long text                            |
+| int          | Integer                              |
+| bool         | Boolean                              |
+| float        | A float number                       |
+| uuid         | An UUID                              |
+| increments   | An incrementing integer              |
+| one-to-many  | A list of records from another table | Table, field
+| many-to-many | A list of records from another table | Table, field
 
 ### UUID
 
@@ -259,18 +260,19 @@ If the UUID field is not primary, on POST creation and PUT update, the API will 
 
 ## Other options
 
-| Option   | Description                               | Parameters
-| -------- | ----------------------------------------- | -------------
-| max      | Check the maximum length                  | Length
-| min      | Check the minimum length                  | Length
-| type     | Check the type                            | Type
-| required | Check if a value exists                   |
-| nullable | Field value can be null and optional      |
-| default  | Set the default value                     | Value
-| primary  | Set the field as primary key              |
-| omit     | Don't return the field value in API       |
-| link     | Link the foreign key to another table     | table, field
-| as       | Return this field value with another name |
+| Option     | Description                                | Parameters
+| ---------- | ------------------------------------------ | -------------
+| max        | Check the maximum length                   | Length
+| min        | Check the minimum length                   | Length
+| type       | Check the type                             | Type
+| required   | Check if a value exists                    |
+| nullable   | Field value can be null and optional       |
+| default    | Set the default value                      | Value
+| primary    | Set the field as primary key               |
+| omit       | Don't return the field value in API        |
+| one-to-one | Link the foreign key to another table      | table, field
+| as         | Return this field value with another name  |
+| cascade    | Delete record if foreign record is deleted | type
 
 ### Type option
 
@@ -291,9 +293,29 @@ Return an error if the JSON don't have the correct type on POST creation and PUT
 }
 ```
 
-### Link and as options
+### One to many
 
 @TODO
+
+### Cascade
+
+The cascade option must be puts in one-to-one or one-to-many fields.
+
+``` JSON
+{
+  "tables": {
+    "order": {
+      "fields": {
+        "product_id": "integer|one-to-one:product:id|cascade",
+        "categories": "one-to-many:category:order_id|cascade",
+  ...
+}
+```
+
+If a record from table order is deleted, the previous API config will:
+- Delete a record from table product if order.product_id is set
+- Delete a list of records from table category if category records are linked to this order record
+- Delete a list of records from table param if param records are linked to this order record
 
 ## API configuration
 
@@ -432,16 +454,21 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ## TODO
 
-- Add field type json
+- Cascade deletion
 - Save and restore database in JSON files
 - Add an error on wrong api methods
 - Add an error if "one-to-one" dont have an "as" option
 - Add type check for email, ip, url
 - Add where clause to one-to-many and one-to-one fields
+
+## PENDING
+
 - Change migration, model, controller, api route path in config
 - Change namespace and class extends in config
 
 ## DONE
 
-- add "many-to-many" type
+- Add field type json
+- Fix wrong fields on update and fillable
+- Add "many-to-many" type
 - Make a default sort number for tables
