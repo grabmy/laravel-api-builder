@@ -85,8 +85,11 @@ class BaseModel extends Model
       foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
         if (isset($fieldOptions['one-to-many']) && isset($fieldOptions['cascade'])) {
           $list = $model->getOneToMany($fieldOptions['one-to-many'][0], $fieldOptions['one-to-many'][1], $model->{$model->primaryKey}, false);
-
-          $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+          foreach ($list as $entity) {
+            $entity->forceDelete();
+          }
+        } else if (isset($fieldOptions['many-to-many'])) {
+          $this->clearManyToMany($fieldOptions['many-to-many'][0], $this->{$this->primaryKey});
         }
       }
     });
