@@ -432,16 +432,15 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ## TODO
 
-- Add field type json
 - Save and restore database in JSON files
 - Add an error on wrong api methods
-- Add an error if "one-to-one" dont have an "as" option
+- Add an error if "link" dont have an "as" option
 - Add type check for email, ip, url
-- Add where clause to one-to-many and one-to-one fields
+- Add field type json
+- Add where clause to list and link fields
 - Change migration, model, controller, api route path in config
 - Change namespace and class extends in config
 
 ## DONE
 
-- add "many-to-many" type
 - Make a default sort number for tables
