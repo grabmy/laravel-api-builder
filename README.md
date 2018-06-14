@@ -313,9 +313,9 @@ The cascade option must be puts in one-to-one or one-to-many fields.
 ```
 
 If a record from table order is deleted, the previous API config will:
+
 - Delete a record from table product if order.product_id is set
 - Delete a list of records from table category if category records are linked to this order record
-- Delete a list of records from table param if param records are linked to this order record
 
 ## API configuration
 
@@ -454,7 +454,6 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ## TODO
 
-- Cascade deletion
 - Save and restore database in JSON files
 - Add an error on wrong api methods
 - Add an error if "link" dont have an "as" option
@@ -469,6 +468,7 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ## DONE
 
+- Cascade deletion
 - Add field type json
 - Fix wrong fields on update and fillable
 - Add "many-to-many" type

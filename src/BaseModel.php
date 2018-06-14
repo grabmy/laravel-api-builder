@@ -93,6 +93,16 @@ class BaseModel extends Model
         }
       }
     });
+
+    self::deleted(function($model) {
+      foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
+        if (isset($fieldOptions['one-to-one']) && isset($fieldOptions['cascade']) && isset($fieldOptions['as'])) {
+          $entity = $model->getLinked($fieldOptions['one-to-one'][0], $fieldOptions['one-to-one'][1], $model->{$fieldName}, false);
+          $entity->forceDelete();
+        }
+      }
+    });
+    
   }
 
   public static function defaultFieldsData() {
