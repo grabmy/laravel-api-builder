@@ -251,7 +251,11 @@ class CreateMigration extends BaseBuilder
           if (!isset($params[1])) {
             $params[1] = 'id';
           }
-          $content .= "      \$table->foreign('".$fieldName."')->references('".$params[1]."')->on('".$params[0]."');\n";
+          $content .= "      \$table->foreign('".$fieldName."')->references('".$params[1]."')->on('".$params[0]."')";
+          if ($field->hasOption('cascade')) {
+            $content .= "->onDelete('cascade')";
+          }
+          $content .= ";\n";
         }
       }
     }

@@ -80,6 +80,16 @@ class BaseModel extends Model
         }
       }
     });
+
+    self::deleting(function($model) {
+      foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
+        if (isset($fieldOptions['one-to-many']) && isset($fieldOptions['cascade'])) {
+          $list = $model->getOneToMany($fieldOptions['one-to-many'][0], $fieldOptions['one-to-many'][1], $model->{$model->primaryKey}, false);
+
+          $model->setAttribute($fieldName, self::encodeField($fieldName, $model->{$fieldName}));
+        }
+      }
+    });
   }
 
   public static function defaultFieldsData() {
@@ -428,7 +438,7 @@ class BaseModel extends Model
         }
       } else if (isset($fieldOptions['one-to-many'])) {
         if ($this->isFetchable($fieldName)) {
-          $this->{$fieldName} = $this->getListed($fieldOptions['one-to-many'][0], $fieldOptions['one-to-many'][1], $this->{$this->primaryKey}, $this->getFetchable($fieldName));
+          $this->{$fieldName} = $this->getOneToMany($fieldOptions['one-to-many'][0], $fieldOptions['one-to-many'][1], $this->{$this->primaryKey}, $this->getFetchable($fieldName));
         }
       } else if (isset($fieldOptions['many-to-many'])) {
         if ($this->isFetchable($fieldName)) {
@@ -490,7 +500,7 @@ class BaseModel extends Model
     return $entity;
   }
 
-  private function getListed($table, $field, $value, $fetchable) {
+  private function getOneToMany($table, $field, $value, $fetchable) {
     // nothing to be found if value is null
     if (is_null($value)) {
       return null;
@@ -626,5 +636,6 @@ class BaseModel extends Model
     return $success;
   }
   
+
 }
 
