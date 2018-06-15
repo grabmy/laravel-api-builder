@@ -308,6 +308,7 @@ The cascade option must be puts in one-to-one or one-to-many fields.
       "fields": {
         "product_id": "integer|one-to-one:product:id|cascade",
         "categories": "one-to-many:category:order_id|cascade",
+        "image": "file|cascade",
   ...
 }
 ```
@@ -316,6 +317,7 @@ If a record from table order is deleted, the previous API config will:
 
 - Delete a record from table product if order.product_id is set
 - Delete a list of records from table category if category records are linked to this order record
+- Delete the file path image if it exists
 
 ## API configuration
 

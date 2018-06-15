@@ -295,7 +295,13 @@ class CreateMigration extends BaseBuilder
 
     $content = '';
 
-    $content .= "      \$table->".$fieldType."('".$fieldName."'";
+    // specific for field type
+    if ($fieldType == 'file') {
+      $content .= "      \$table->string('".$fieldName."'";
+    } else {
+      $content .= "      \$table->".$fieldType."('".$fieldName."'";
+    }
+    
     if (!empty($fieldTypeParams)) {
       foreach ($fieldTypeParams as $param) {
         if (is_string($param)) {

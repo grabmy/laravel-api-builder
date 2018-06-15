@@ -31,6 +31,7 @@ class BuilderField extends BaseBuilder
    * boolean: Boolean type
    * one-to-many: get a list of linked records from another table. The "one-to-one" option field 
    *   must be set in the definition of the other table. Corresponds to a relationship one-to-many
+   * file: a file path stored as a string, deleted if has cascade option
    *
    * @var array
    */
@@ -44,7 +45,7 @@ class BuilderField extends BaseBuilder
     'datetime' => ['mandatory' => 0, 'optional' => 0],
     'increments' => ['mandatory' => 0, 'optional' => 0],
     'float' => ['mandatory' => 0, 'optional' => 0],
-    // 'decimal' => ['mandatory' => 0, 'optional' => 0],
+    'file' => ['mandatory' => 0, 'optional' => 0],
     'bool' => ['mandatory' => 0, 'optional' => 0],
     'boolean' => ['mandatory' => 0, 'optional' => 0],
     'json' => ['mandatory' => 0, 'optional' => 0],
@@ -67,7 +68,7 @@ class BuilderField extends BaseBuilder
    *   Corresponds to a relationship one-to-one
    * as: For linked field, the foreign entity is retrieved in a variable by API and omitted
    * omit: Field is not returned by API
-   * cascade: @TODO For linked field, cascade the deletion to the foreign table entry (entity and/or link)
+   * cascade: For linked field, cascade the deletion to the foreign table entry or file
    *
    * @var array
    */
@@ -84,7 +85,7 @@ class BuilderField extends BaseBuilder
     'as' => ['mandatory' => 1, 'optional' => 0, 'list' => ['field']],
     'omit' => ['mandatory' => 0, 'optional' => 0],
     'index' => ['mandatory' => 0, 'optional' => 0],
-    'cascade' => ['mandatory' => 0, 'optional' => 1, 'list' => ['type']],
+    'cascade' => ['mandatory' => 0, 'optional' => 0],
   ];
 
 

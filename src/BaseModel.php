@@ -89,7 +89,7 @@ class BaseModel extends Model
             $entity->forceDelete();
           }
         } else if (isset($fieldOptions['many-to-many'])) {
-          $this->clearManyToMany($fieldOptions['many-to-many'][0], $this->{$this->primaryKey});
+          $model->clearManyToMany($fieldOptions['many-to-many'][0], $model->{$model->primaryKey});
         }
       }
     });
@@ -99,6 +99,10 @@ class BaseModel extends Model
         if (isset($fieldOptions['one-to-one']) && isset($fieldOptions['cascade']) && isset($fieldOptions['as'])) {
           $entity = $model->getLinked($fieldOptions['one-to-one'][0], $fieldOptions['one-to-one'][1], $model->{$fieldName}, false);
           $entity->forceDelete();
+        } else if (isset($fieldOptions['file']) && isset($fieldOptions['cascade'])) {
+          if (isset($model->{$fieldName}) && !is_null($model->{$fieldName})) {
+            @unlink($model->{$fieldName});
+          }
         }
       }
     });
