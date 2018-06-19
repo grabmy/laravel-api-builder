@@ -452,7 +452,7 @@ Be aware that the more you fetch records from other tables, the slower your API 
 ## What this API generator doesn't do
 
 - Table with multiple fields as primary key
-- Change the path of generated files
+- Change the path of generated files (models, controllers ...)
 
 ## TODO
 
@@ -462,12 +462,6 @@ Be aware that the more you fetch records from other tables, the slower your API 
 - Add type check for email, ip, url
 - Add field type json
 
-## PENDING
-
-- Add where clause to one-to-many and one-to-one fields
-- Change migration, model, controller, api route path in config
-- Change namespace and class extends in config
-
 ## DONE
 
 - Cascade deletion
@@ -475,3 +469,9 @@ Be aware that the more you fetch records from other tables, the slower your API 
 - Fix wrong fields on update and fillable
 - Add "many-to-many" type
 - Make a default sort number for tables
+
+## PENDING
+
+- Add where clause to one-to-many and one-to-one fields
+- Change migration, model, controller, api route path in config
+- Change namespace and class extends in config

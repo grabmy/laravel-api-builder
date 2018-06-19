@@ -138,7 +138,7 @@ class BaseModel extends Model
       return $value;
     }
     if (isset($fieldsDefinition[$name]['json'])) {
-      if (!empty($value) && trim($value) != "") {
+      if (is_string($value)) {
         $value = json_decode($value);
       }
     }
@@ -159,7 +159,7 @@ class BaseModel extends Model
       return $value;
     }
     if (isset($fieldsDefinition[$name]['json'])) {
-      if (!empty($value) && trim($value) != "") {
+      if (!is_string($value)) {
         $value = json_encode($value);
       }
     }
