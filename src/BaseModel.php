@@ -548,10 +548,13 @@ class BaseModel extends Model
     $result = [];
     foreach ($list as $entity) {
       $entity->fetchable = $fetchable;
+
       if ($fetchable !== false) {
         $entity->fetch();
-      }      $result[] = $entity;
+      }
+      $result[] = $entity;
     }
+
     return $list;
   }
 
@@ -636,7 +639,11 @@ class BaseModel extends Model
       if (isset($fieldOptions['many-to-many']) || isset($fieldOptions['one-to-many'])) {
         unset($inputsData[$fieldName]);
       } else if (isset($fieldOptions['json'])) {
-        $inputsData[$fieldName] = json_encode($inputsData[$fieldName]);
+        if (isset($inputsData[$fieldName])) {
+          $inputsData[$fieldName] = json_encode($inputsData[$fieldName]);
+        } else {
+          // $inputsData[$fieldName] = null;
+        }
       }
     }
     $entity = static::query()->create($inputsData);
