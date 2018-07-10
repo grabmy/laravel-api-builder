@@ -35,7 +35,7 @@ class CreateCommand extends Command
     $builder = new Builder($this);
     $builder->load($file);
     if ($builder->hasError()) {
-      $this->error(' > No file generated due to errors');
+      $this->error(' > No files generated due to errors');
     } else {
       $builder->createMigration();
       $builder->createModel();
