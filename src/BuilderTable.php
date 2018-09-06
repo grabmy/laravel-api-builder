@@ -189,27 +189,7 @@ class BuilderTable extends BaseBuilder
           unset($options[$name]);
         }
       }
-
-      /*
-      if ($field->hasOption('many-to-many')) {
-        $target = null;
-        foreach($tables as $table) {
-          if ($table->getName() == $field->getOption('many-to-many')[0]) {
-            $target = $table;
-            break;
-          }
-        }
-        if (!$target) {
-          $this->log('warning', 'Warning in the model of the table "'.$this->getName().'"');
-          $this->log('warning', 'Reference to table "'.$field->getOption('many-to-many')[0].'" not found for field "'.$field->getName().'" option "many-to-many"');
-          continue;
-        }
-
-        $linkTable = $this->getName().'_'.$target->getName().'_link';
-
-        
-      }
-      */
+      
       $result[$fieldName] = $options;
     }
 

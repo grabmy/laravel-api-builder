@@ -75,10 +75,10 @@ class BuilderField extends BaseBuilder
   protected static $optionList = [
     'unique' => ['mandatory' => 0, 'optional' => 0],
     'default' => ['mandatory' => 1, 'optional' => 0, 'list' => ['value']],
-    'min' => ['mandatory' => 1, 'optional' => 0, 'list' => ['value']],
-    'max' => ['mandatory' => 1, 'optional' => 0, 'list' => ['value']],
+    'min' => ['mandatory' => 1, 'optional' => 0, 'list' => ['value'], 'with' => ['int', 'integer', 'string', 'text', 'float']],
+    'max' => ['mandatory' => 1, 'optional' => 0, 'list' => ['value'], 'with' => ['int', 'integer', 'string', 'text', 'float']],
     'nullable' => ['mandatory' => 0, 'optional' => 0],
-    'primary' => ['mandatory' => 0, 'optional' => 0],
+    'primary' => ['mandatory' => 0, 'optional' => 0, 'without' => ['json', 'one-to-one', 'one-to-many', 'many-to-many', 'bool', 'boolean', 'file']],
     'required' => ['mandatory' => 0, 'optional' => 0],
     'type' => ['mandatory' => 1, 'optional' => 0, 'list' => ['type']],
     'one-to-one' => ['mandatory' => 2, 'optional' => 0, 'list' => ['table', 'field']],
@@ -195,6 +195,36 @@ class BuilderField extends BaseBuilder
     } else {
       $this->log('error', 'Unknown option "'.$optionName.'" for field "'.$this->fieldName.'"');
       return false;
+    }
+
+    if (isset($validation['with'])) {
+      $found = false;
+      foreach ($validation['with'] as $option) {
+        if (isset($this->options[$option])) {
+          $found = true;
+          break;
+        }
+      }
+      if (!$found) {
+        $this->log('error', 'Field "'.$this->fieldName.'" option "'.$optionName.'" can only be with options "'.implode('", "', $validation['with']).'"');
+        $this->log('error', 'Parameters for field "'.$this->fieldName.'":  "'.$this->fieldOptions.'"');
+        return false;
+      }
+    }
+
+    if (isset($validation['without'])) {
+      $found = false;
+      foreach ($validation['without'] as $option) {
+        if (isset($this->options[$option])) {
+          $found = true;
+          break;
+        }
+      }
+      if ($found) {
+        $this->log('error', 'Field "'.$this->fieldName.'" option "'.$optionName.'" cannot be with option "'.$option.'"');
+        $this->log('error', 'Parameters for field "'.$this->fieldName.'":  "'.$this->fieldOptions.'"');
+        return false;
+      }
     }
 
     if (count($optionParams) < $validation['mandatory']) {

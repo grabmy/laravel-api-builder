@@ -73,6 +73,14 @@ class BaseModel extends Model
       }
     });
 
+    self::updating(function ($model) {
+      foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
+        if ($model->isFillable($fieldName) && $model->primaryKey != $fieldName) {
+          $model->setAttribute($fieldName, self::decodeField($fieldName, $model->{$fieldName}));
+        }
+      }
+    });
+
     self::updated(function ($model) {
       foreach ($model->fieldsDefinition as $fieldName => $fieldOptions) {
         if ($model->isFillable($fieldName)) {
@@ -540,10 +548,13 @@ class BaseModel extends Model
     $result = [];
     foreach ($list as $entity) {
       $entity->fetchable = $fetchable;
+
       if ($fetchable !== false) {
         $entity->fetch();
-      }      $result[] = $entity;
+      }
+      $result[] = $entity;
     }
+
     return $list;
   }
 
@@ -643,6 +654,7 @@ class BaseModel extends Model
   
   public function update(array $attributes = [], array $options = []) {
     $inputsData = $attributes;
+
     foreach ($this->fieldsDefinition as $fieldName => $fieldOptions) {
       if (isset($fieldOptions['many-to-many']) || isset($fieldOptions['one-to-many'])) {
         unset($inputsData[$fieldName]);
