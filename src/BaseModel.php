@@ -628,7 +628,11 @@ class BaseModel extends Model
       if (isset($fieldOptions['many-to-many']) || isset($fieldOptions['one-to-many'])) {
         unset($inputsData[$fieldName]);
       } else if (isset($fieldOptions['json'])) {
-        $inputsData[$fieldName] = json_encode($inputsData[$fieldName]);
+        if (isset($inputsData[$fieldName])) {
+          $inputsData[$fieldName] = json_encode($inputsData[$fieldName]);
+        } else if (isset($fieldOptions['nullable'])) {
+          $inputsData[$fieldName] = NULL;
+        }
       }
     }
     $entity = static::query()->create($inputsData);
