@@ -127,16 +127,23 @@ class CreateController extends BaseBuilder
     $content .= "   */\n";
     $content .= "  public function show(\$id)\n";
     $content .= "  {\n";
+    if ($table->hasHook()) {
+      $content .= "      \$id = ".$table->getHook()."('get:before', \$id);\n";
+    }
     $content .= "    \$entity = " . $phpName . "::find(\$id);\n";
     $content .= "    \n";
     $content .= "    if (\$entity) {\n";
     $content .= "      \$result = \$entity->fetch()->getFiltered();\n";
     if ($table->hasHook()) {
-      $content .= "      \$result = ".$table->getHook()."('get', \$id, \$result);\n";
+      $content .= "      \$result = ".$table->getHook()."('get:after', \$id, \$result);\n";
     }
     $content .= "      return \$this->response(\$result, 200);\n";
     $content .= "    } else {\n";
-    $content .= "      return \$this->response(null, 404);\n";
+    $content .= "      \$errors = [];\n";
+    if ($table->hasHook()) {
+      $content .= "    \$errors = ".$table->getHook()."('get:error', \$id, \$errors);\n";
+    }
+    $content .= "      return \$this->response(\$errors, 404);\n";
     $content .= "    }\n";
     $content .= "  }\n";
     $content .= "  \n";
@@ -148,10 +155,16 @@ class CreateController extends BaseBuilder
     $content .= "    // Get the inputs\n";
     $content .= "    \$inputs = \$request->all();\n";
     $content .= "    \n";
+    if ($table->hasHook()) {
+      $content .= "      \$inputs = ".$table->getHook()."('create:before', \$inputs);\n";
+    }
     $content .= "    // Check for errors\n";
     $content .= "    \$errors = " . $phpName . "::validateFields(\$inputs);\n";
     $content .= "    \n";
     $content .= "    if (count(\$errors) > 0) {\n";
+    if ($table->hasHook()) {
+      $content .= "      \$errors = ".$table->getHook()."('create:error', \$inputs, \$errors);\n";
+    }
     $content .= "      return \$this->response(\$errors, 400);\n";
     $content .= "    }\n";
     $content .= "    \n";
@@ -161,17 +174,21 @@ class CreateController extends BaseBuilder
     $content .= "    } catch (\\Illuminate\\Database\\QueryException \$e) {\n";
     $content .= "      // Return the SQL error\n";
     $content .= "      if (config('app.APP_DEBUG') === false) {\n";
-    $content .= "        return \$this->response(['type' => 'error-sql-query'], 500);\n";
+    $content .= "        \$errors = ['type' => 'error-sql-query'];\n";
     $content .= "      } else {\n";
-    $content .= "        return \$this->response(['type' => 'error-sql-query', 'message' => \$e->getMessage()], 500);\n";
+    $content .= "        \$errors = ['type' => 'error-sql-query', 'message' => \$e->getMessage()];\n";
     $content .= "      }\n";
+    if ($table->hasHook()) {
+      $content .= "      \$errors = ".$table->getHook()."('create:error', \$inputs, \$errors);\n";
+    }
+    $content .= "      return \$this->response(\$errors, 500);\n";
     $content .= "    }\n";
     $content .= "    \n";
     $content .= "    if (\$this->fetchOnStore) {\n";
     $content .= "      \$entity = \$entity->fetch()->getFiltered();\n";
     $content .= "    }\n";
     if ($table->hasHook()) {
-      $content .= "    \$entity = ".$table->getHook()."('create', \$inputs, \$entity);\n";
+      $content .= "    \$entity = ".$table->getHook()."('create:after', \$inputs, \$entity);\n";
     }
     $content .= "    \n";
     $content .= "    // Success\n";
@@ -186,9 +203,15 @@ class CreateController extends BaseBuilder
     $content .= "    // Get the inputs\n";
     $content .= "    \$inputs = \$request->all();\n";
     $content .= "    \n";
+    if ($table->hasHook()) {
+      $content .= "      \$inputs = ".$table->getHook()."('update:before', \$inputs);\n";
+    }
     $content .= "    // Check for errors\n";
     $content .= "    \$errors = " . $phpName . "::validateFields(\$inputs, true);\n";
     $content .= "    if (count(\$errors) > 0) {\n";
+    if ($table->hasHook()) {
+      $content .= "      \$errors = ".$table->getHook()."('update:error', \$inputs, \$errors);\n";
+    }
     $content .= "      return \$this->response(\$errors, 400);\n";
     $content .= "    }\n";
     $content .= "    \n";
@@ -203,13 +226,17 @@ class CreateController extends BaseBuilder
     $content .= "      }\n";
     $content .= "      \n";
     if ($table->hasHook()) {
-      $content .= "      \$result = ".$table->getHook()."('update', \$inputs, \$result);\n";
+      $content .= "      \$result = ".$table->getHook()."('update:after', \$inputs, \$result);\n";
     }
     $content .= "      // Return success\n";
     $content .= "      return \$this->response(\$result, 200);\n";
     $content .= "    } else {\n";
     $content .= "      // Entity not found\n";
-    $content .= "      return \$this->response(null, 404);\n";
+    $content .= "      \$errors = [];\n";
+    if ($table->hasHook()) {
+      $content .= "      \$errors = ".$table->getHook()."('update:error', \$inputs, \$errors);\n";
+    }
+    $content .= "      return \$this->response(\$errors, 404);\n";
     $content .= "    }\n";
     $content .= "  }\n";
     $content .= "  \n";
@@ -218,18 +245,25 @@ class CreateController extends BaseBuilder
     $content .= "   */\n";
     $content .= "  public function delete(\$id)\n";
     $content .= "  {\n";
+    if ($table->hasHook()) {
+      $content .= "      \$id = ".$table->getHook()."('delete:before', \$id);\n";
+    }
     $content .= "    // Get the entity\n";
     $content .= "    \$entity = " . $phpName . "::find(\$id);\n";
     $content .= "    \n";
     $content .= "    if (\$entity && \$entity->delete()) {\n";
     if ($table->hasHook()) {
-      $content .= "      \$entity = ".$table->getHook()."('delete', \$id, \$entity);\n";
+      $content .= "      \$entity = ".$table->getHook()."('delete:after', \$id, \$entity);\n";
     }
     $content .= "      // Return success\n";
     $content .= "      return \$this->response(null, 204);\n";
     $content .= "    } else {\n";
     $content .= "      // Entity not found\n";
-    $content .= "      return \$this->response(null, 404);\n";
+    $content .= "      \$errors = [];\n";
+    if ($table->hasHook()) {
+      $content .= "      \$errors = ".$table->getHook()."('delete:error', \$id, \$errors);\n";
+    }
+    $content .= "      return \$this->response(\$errors, 404);\n";
     $content .= "    }\n";
     $content .= "  }\n";
     $content .= "  \n";
