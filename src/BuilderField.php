@@ -58,6 +58,7 @@ class BuilderField extends BaseBuilder
    * 
    * unique : Make the value unique @TODO check at model level if the value is unique in DB
    * default: Default value if created with Null or omitted
+   * defaultfunv: Default value as a SQL function if created with Null or omitted
    * min: Minimum value for integer or float, minimum length for string, minimum length for array, 
    *   if not null
    * nullable: Field can be Null
@@ -66,6 +67,8 @@ class BuilderField extends BaseBuilder
    * type: Check the type of the value if not null
    * one-to-one: Create a linked field to bind a record from another table, as a foreign key. 
    *   Corresponds to a relationship one-to-one
+   * one-to-many: Create a linked field to bind one or more records from another table, as a 
+   *   foreign key. Corresponds to a relationship one-to-many
    * as: For linked field, the foreign entity is retrieved in a variable by API and omitted
    * omit: Field is not returned by API
    * cascade: For linked field, cascade the deletion to the foreign table entry or file
@@ -75,6 +78,7 @@ class BuilderField extends BaseBuilder
   protected static $optionList = [
     'unique' => ['mandatory' => 0, 'optional' => 0],
     'default' => ['mandatory' => 1, 'optional' => 0, 'list' => ['value']],
+    'defaultexp' => ['mandatory' => 1, 'optional' => 0, 'list' => ['value']],
     'min' => ['mandatory' => 1, 'optional' => 0, 'list' => ['value'], 'with' => ['int', 'integer', 'string', 'text', 'float']],
     'max' => ['mandatory' => 1, 'optional' => 0, 'list' => ['value'], 'with' => ['int', 'integer', 'string', 'text', 'float']],
     'nullable' => ['mandatory' => 0, 'optional' => 0],

@@ -75,17 +75,17 @@ class CreateRoute extends BaseBuilder
       foreach ($methods as $method) {
         switch ($method) {
           case 'GET':
-            $content .= "  Route::get('" . $endPoint . "', '" . $phpName . "Controller@index');\n";
-            $content .= "  Route::get('" . $endPoint . "/{" . strtolower($phpName) . "}', '" . $phpName . "Controller@show');\n";
+            $content .= "  Route::get('" . $endPoint . "', 'App\\Http\\Controllers\\" . $phpName . "Controller@index');\n";
+            $content .= "  Route::get('" . $endPoint . "/{" . strtolower($phpName) . "}', 'App\\Http\\Controllers\\" . $phpName . "Controller@show');\n";
             break;
           case 'POST':
-            $content .= "  Route::post('" . $endPoint . "', '" . $phpName . "Controller@store');\n";
+            $content .= "  Route::post('" . $endPoint . "', 'App\\Http\\Controllers\\" . $phpName . "Controller@store');\n";
             break;
           case 'PUT':
-            $content .= "  Route::put('" . $endPoint . "/{" . strtolower($phpName) . "}', '" . $phpName . "Controller@update');\n";        
+            $content .= "  Route::put('" . $endPoint . "/{" . strtolower($phpName) . "}', 'App\\Http\\Controllers\\" . $phpName . "Controller@update');\n";        
             break;
           case 'DELETE':
-            $content .= "  Route::delete('" . $endPoint . "/{" . strtolower($phpName) . "}', '" . $phpName . "Controller@delete');\n";        
+            $content .= "  Route::delete('" . $endPoint . "/{" . strtolower($phpName) . "}', 'App\\Http\\Controllers\\" . $phpName . "Controller@delete');\n";        
             break;
           default:
             break;

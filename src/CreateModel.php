@@ -96,32 +96,38 @@ class CreateModel extends BaseBuilder
 
     // primary key field
     $primary = $table->getPrimary();
-    if ($primary->getName() != 'id') {
-      $content .= "  /**\n";
-      $content .= "   * Primary key field name.\n";
-      $content .= "   *\n";
-      $content .= "   * @var string\n";
-      $content .= "   */\n";
-      $content .= "  protected \$primaryKey = '" . $primary->getName() . "';\n";
-      $content .= "  \n";
-    }
-    if ($primary->getType() != '') {
-      $content .= "  /**\n";
-      $content .= "   * Primary key type.\n";
-      $content .= "   *\n";
-      $content .= "   * @var string\n";
-      $content .= "   */\n";
-      $content .= "  protected \$keyType = '" . $primary->getType() . "';\n";
-      $content .= "  \n";
-    }
-    if ($primary->getType() != 'increments') {
-      $content .= "  /**\n";
-      $content .= "   * Primary key incrementing.\n";
-      $content .= "   *\n";
-      $content .= "   * @var boolean\n";
-      $content .= "   */\n";
-      $content .= "  public \$incrementing = false;\n";
-      $content .= "  \n";
+    if ($primary)
+    {
+      if ($primary->getName() != 'id') {
+        $content .= "  /**\n";
+        $content .= "   * Primary key field name.\n";
+        $content .= "   *\n";
+        $content .= "   * @var string\n";
+        $content .= "   */\n";
+        $content .= "  protected \$primaryKey = '" . $primary->getName() . "';\n";
+        $content .= "  \n";
+      }
+      if ($primary->getType() != '') {
+        $content .= "  /**\n";
+        $content .= "   * Primary key type.\n";
+        $content .= "   *\n";
+        $content .= "   * @var string\n";
+        $content .= "   */\n";
+        $content .= "  protected \$keyType = '" . $primary->getType() . "';\n";
+        $content .= "  \n";
+      }
+      if ($primary->getType() != 'increments') {
+        $content .= "  /**\n";
+        $content .= "   * Primary key incrementing.\n";
+        $content .= "   *\n";
+        $content .= "   * @var boolean\n";
+        $content .= "   */\n";
+        $content .= "  public \$incrementing = false;\n";
+        $content .= "  \n";
+      }
+    } else
+    {
+      $this->log('warning', 'No primary key field for table "'.$tableName.'"');
     }
 
     $content .= "  /**\n";

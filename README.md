@@ -75,7 +75,7 @@ You still have to run the migration that creates the table in your database.
 > **WARNING**: the basic migrate command will also destroy and recreate other tables you have in the migration of your project
 
 ``` shell
-php artisan migrate fresh
+php artisan migrate:fresh
 ```
 
 Assuming your project is accessible at "http://127.0.0.1:8000/", you can now:
@@ -260,19 +260,20 @@ If the UUID field is not primary, on POST creation and PUT update, the API will 
 
 ## Other options
 
-| Option     | Description                                | Parameters
-| ---------- | ------------------------------------------ | -------------
-| max        | Check the maximum length                   | Length
-| min        | Check the minimum length                   | Length
-| type       | Check the type                             | Type
-| required   | Check if a value exists                    |
-| nullable   | Field value can be null and optional       |
-| default    | Set the default value                      | Value
-| primary    | Set the field as primary key               |
-| omit       | Don't return the field value in API        |
-| one-to-one | Link the foreign key to another table      | table, field
-| as         | Return this field value with another name  |
-| cascade    | Delete record if foreign record is deleted | type
+| Option      | Description                                | Parameters
+| ----------- | ------------------------------------------ | -------------
+| max         | Check the maximum length                   | Length
+| min         | Check the minimum length                   | Length
+| type        | Check the type                             | Type
+| required    | Check if a value exists                    |
+| nullable    | Field value can be null and optional       |
+| default     | Set the default value                      | Value
+| defaultexp  | Set the default value as a SQL expression  | Value
+| primary     | Set the field as primary key               |
+| omit        | Don't return the field value in API        |
+| one-to-one  | Link the foreign key to another table      | table, field
+| as          | Return this field value with another name  |
+| cascade     | Delete record if foreign record is deleted | type
 
 ### Type option
 

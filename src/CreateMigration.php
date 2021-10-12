@@ -321,6 +321,11 @@ class CreateMigration extends BaseBuilder
         case 'unique':
           $content .= '->unique()';
           break;
+        case 'defaultexp':
+          if (isset($params[0])) {
+            $content .= '->default(DB::raw(\''.$params[0].'\'));';
+          }
+          break;
         case 'default':
           if (isset($params[0])) {
             if ($fieldType == 'bool') {
