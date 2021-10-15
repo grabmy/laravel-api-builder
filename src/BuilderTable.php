@@ -21,7 +21,7 @@ class BuilderTable extends BaseBuilder
   /**
    * List of fields
    *
-   * @var BuilderField
+   * @var BuilderTableField
    */
   private $fields;
 
@@ -42,7 +42,7 @@ class BuilderTable extends BaseBuilder
   /**
    * Primary field
    *
-   * @var BuilderField
+   * @var BuilderTableField
    */
   private $primary;
 
@@ -51,7 +51,7 @@ class BuilderTable extends BaseBuilder
    *
    * @var array
    */
-  private $omitted;
+  //private $omitted;
 
   /**
    * List of indexed fields in table
@@ -84,7 +84,7 @@ class BuilderTable extends BaseBuilder
     $this->fields = [];
     $this->api = [];
     $this->primary = null;
-    $this->omitted = [];
+    //$this->omitted = [];
     $this->indexed = [];
     
     // Stop if no field
@@ -95,7 +95,7 @@ class BuilderTable extends BaseBuilder
     
     // Build the fields
     foreach ($tableOptions['fields'] as $fieldName => $fieldOptions) {
-      $field = new BuilderField($this->command, $fieldName, $fieldOptions);
+      $field = new BuilderTableField($this->command, $fieldName, $fieldOptions);
       if ($field->hasError()) {
         $this->error = true;
       } else {
@@ -104,9 +104,12 @@ class BuilderTable extends BaseBuilder
           $this->primary = $field;
           $this->indexed[] = $field->getName();
         }
+        /*
+        // Removed API feature
         if ($field->hasOption('omit')) {
           $this->omitted[] = $field->omitted();
         }
+        */
       }
     }
 
@@ -117,6 +120,8 @@ class BuilderTable extends BaseBuilder
     }
 
     // Initialisation of API
+    /*
+    // Remove API feature
     if (isset($tableOptions['api'])) {
       $this->api = $tableOptions['api'];
       $this->api['prefix'] = isset($this->api['prefix']) ? $this->api['prefix'] : '';
@@ -134,8 +139,10 @@ class BuilderTable extends BaseBuilder
     if (isset($tableOptions['sort'])) {
       $this->sort = intval($tableOptions['sort']);
     }
+    */
   }
 
+  /*
   public function hasHook() {
     return isset($this->hook);
   }
@@ -144,34 +151,55 @@ class BuilderTable extends BaseBuilder
     return $this->hook;
   }
 
+  public function getApi() {
+    return $this->api;
+  }
+  */
+
+  /**
+   * Get the sort order for creating tables
+   */
   public function getSort() {
     return $this->sort;
   }
 
-  public function getApi() {
-    return $this->api;
-  }
-
+  /**
+   * Get the name of the table
+   */
   public function getName() {
     return $this->tableName;
   }
 
+  /**
+   * Get the primary field of the table
+   */
   public function getPrimary() {
     return $this->primary;
   }
 
+  /**
+   * Get the indexed field of the table
+   */
   public function getIndexed() {
     return $this->indexed;
   }
 
+  /*
   public function getOmitted() {
     return $this->omitted;
   }
+  */
 
+  /**
+   * Get the fields of the table
+   */
   public function getFields() {
     return $this->fields;
   }
 
+  /**
+   * Get the fields of the table in an array
+   */
   public function getFieldsArray() {
     $result = [];
 
@@ -206,7 +234,7 @@ class BuilderTable extends BaseBuilder
 
     return $name;
   }
-
+  
   public function getFillable() {
     $fillable = [];
     foreach ($this->fields as $fieldName => $field) {

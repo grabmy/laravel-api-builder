@@ -1,0 +1,10 @@
+{
+  "api": {
+    "prefix": "/api",
+    "paths": {
+      "/test/{id}": {
+        "GET": true
+      }
+    }
+  }
+}

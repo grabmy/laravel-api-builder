@@ -7,16 +7,19 @@ class CreateController extends BaseBuilder
 
   private $tables;
 
+  private $api;
+
   private static $baseDir = './app/Http/Controllers/';
 
   private static $extends = '\\Laravel\\Api\\Builder\\BaseController';
 
   private static $namespace = 'App\\Http\\Controllers';
 
-  public function __construct($command, $tables) {
+  public function __construct($command, $tables, $api) {
     parent::__construct($command);
     
     $this->tables = $tables;
+    $this->api = $api;
   }
 
   private static function getControllerFilename($table) {

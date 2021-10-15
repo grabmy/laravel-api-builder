@@ -57,7 +57,7 @@ class CreateModel extends BaseBuilder
     $tableName = $table->getName();
     $phpName = $table->getPhpName();
     $fields = $table->getFields();
-    $api = $table->getApi();
+    //$api = $table->getApi();
     $fieldsDefinition = $table->getFieldsArray();
 
     $content = "<?php\n";
@@ -148,11 +148,15 @@ class CreateModel extends BaseBuilder
     $content .= "   *\n";
     $content .= "   * @var array\n";
     $content .= "   */\n";
+    $content .= "  public \$fetchable = true;\n";
+    /*
+    // Removed API feature
     if (isset($api['fetchable'])) {
       $content .= "  public \$fetchable = " . var_export($api['fetchable'], true) . ";\n";
     } else {
       $content .= "  public \$fetchable = true;\n";
     }
+    */
     $content .= "  \n";
 
     $content .= "  public static function staticGetFieldsDefinition() {\n";

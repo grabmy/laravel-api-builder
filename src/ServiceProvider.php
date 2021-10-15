@@ -11,7 +11,8 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
    */
   public function boot() {
     $this->commands([
-      CreateCommand::class
+      MakeApiCommand::class,
+      ApiMigrationCommand::class,
     ]);
   }
 

@@ -19,7 +19,11 @@ class BaseBuilder
     return $this->error;
   }
   
-
+  /**
+   * Remove a straing between two strings
+   * 
+   * @param 
+   */
   protected static function removeBetween($start, $end, $string) {
     $startPos = strpos($string, $start);
     $endPos = strpos($string, $end);
@@ -36,8 +40,9 @@ class BaseBuilder
   /**
    * Log informations to the console
    *
-   * @param [type] $type
-   * @param [type] $message
+   * @param [string] $type
+   * @param [string] $message
+   * @param [string] $verbosity "v"
    * @return void
    */
   protected function log($type, $message, $verbosity = null) {

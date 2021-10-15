@@ -65,6 +65,10 @@ class CreateMigration extends BaseBuilder
       $this->log('comment', $count_file_created . ' file created', 'v');
     }
 
+    if ($count_file_created > 0) {
+      $this->log('comment', 'Run the following command to execute migration:');
+      $this->log('info', '    php artisan migrate:fresh');
+    }
   }
 
   public function createTables() {
@@ -283,7 +287,7 @@ class CreateMigration extends BaseBuilder
    *
    * @return string
    */
-  public function getMigrationField(BuilderField $field) {
+  public function getMigrationField(BuilderTableField $field) {
     $fieldType = $field->getType();
     if ($fieldType == 'one-to-many' || $fieldType == 'many-to-many') {
       return '';

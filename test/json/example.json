@@ -1,0 +1,164 @@
+{
+  "version": "0.2.1",
+  "name": "Example API",
+  "description": "Full features demo",
+
+  "model": {
+    "tables": {
+      "types": {
+        "fields": {
+          "_uuid": "uuid",
+          "_string": "string",
+          "_text": "text",
+          "_int": "int",
+          "_integer": "integer",
+          "_float": "float",
+          "_date": "date",
+          "_datetime": "datetime",
+          "_increments": "increments",
+          "_file": "file",
+          "_booleam": "boolean",
+          "_bool": "bool",
+          "_json": "json"
+        }
+      },
+      "link": {
+        "fields": {
+          "id": ["uuid", "primary"],
+          "duplicate": ["uuid", "fk:link:id", "notself"],
+          "self": ["uuid", "fk:link:id"],
+          "parent": ["uuid", "fk:link:id", "notself", "noloop"],
+          "type": ["uuid", "fk:link:id", "notself", "noloop"]
+        }
+      },
+      "void": {
+        "fields": {
+          "id": ["uuid", "primary"],
+          "_uuid": ["uuid", "nullable"],
+          "_string": ["string", "nullable"],
+          "_text": ["text", "nullable"],
+          "_int": ["int", "nullable"],
+          "_integer": ["integer", "nullable"],
+          "_float": ["float", "nullable"],
+          "_date": ["date", "nullable"],
+          "_datetime": ["datetime", "nullable"],
+          "_increments": ["increments", "nullable"],
+          "_file": ["file", "nullable"],
+          "_booleam": ["boolean", "nullable"],
+          "_bool": ["bool", "nullable"],
+          "_json": ["json", "nullable"]
+        }
+      }
+    }
+  },
+  
+  "parameters": {
+    "element_align": {
+      "type": "string",
+      "enum": ["left", "right", "center"]
+    },
+    "element_name": {
+      "type": "string",
+      "min": 1,
+      "max": 16
+    }
+  },
+
+  "api": {
+    "prefix": "/api",
+    "paths": {
+      "/test/{_uuid}": {
+        "GET": {
+          "tables": ["test_types"],
+          "result": {
+            "_uuid": true,
+            "_string": true,
+            "_text": true,
+            "_int": true,
+            "_integer": true,
+            "_float": true,
+            "_date": true,
+            "_datetime": true,
+            "_increments": true,
+            "_file": true,
+            "_booleam": true,
+            "_bool": true,
+            "_json": true
+          }
+        }
+      },
+      "/test2/{id}": {
+        "GET": {
+          "tables": ["types"],
+          "validate": {
+            "id": "uuid"
+          },
+          "filters": [
+            {
+              "_uuid":
+              {
+                "eq": "{id}"
+              }
+            }
+          ],
+          "result": {
+            "_uuid": true,
+            "_string": true
+          }
+        }
+      }
+    }
+  },
+
+  "test": {
+    "server": "http://127.0.0.1:8001/api",
+    "actions": [
+      {
+        "description": "Run test_empty.json",
+        "run": "php artisan make:api ./vendor/grabmy/laravel-api-builder/test/test_empty.json",
+        "result": {
+          "code": 0,
+          "output": [
+            { "contains": "warning" },
+            { "contains": "warning" },
+            { "contains": "warning" }
+          ]
+        }
+      },
+      {
+        "description": "Request GET on /test returns content",
+        "request": {
+          "GET": "/test",
+          "headers": [
+            { "Accept": "json" }
+          ]
+        },
+        "result": {
+          "code": 200,
+          "headers": [
+            {"content-length": {"gt": 0}},
+            {"content-type": {"eq": "application/json"}}
+          ],
+          "content": {"json": "application.test.name"}
+        },
+        "store": {
+          "type": "headers:content-type",
+          "name": "content:application.test.name",
+          "version": "content:application.test.version"
+        }
+      },
+      {
+        "request": {
+          "GET": "/test/{store:version}",
+          "header": [
+            { "Accept": "json" }
+          ]
+        },
+        "result": {
+          "code": 404,
+          "content": "{message: \"Not found\"}"
+        }
+      }
+    ]
+  }
+}

@@ -6,8 +6,9 @@ Author: Thierry DE LAPEYRE
 
 ## Features
 
-- Generate table migration file, controller file, model file and add the routes
+- Generate tables migration files, controller files, model files and add the routes
 - One artisan command to generate everything with logs
+- All the Rest standard requests of REST: get list, get record, create, update, delete
 - Fetch the foreign table record or list of records linked to your table
 - Validate fields and return comprehensive errors
 - Separate the table constraints and sort the table creation to prevent migration errors
@@ -15,7 +16,7 @@ Author: Thierry DE LAPEYRE
 ## Requires
 
 - PHP >= 7
-- Laravel >= 5.5
+- Laravel >= 8
 
 ## Install
 
@@ -42,17 +43,25 @@ Create a configuration file "api.json" in the root folder of your Laravel projec
 
 ``` JSON
 {
-  "tables": {
+  "model": {
+    "tables": {
+      "article": {
+        "fields": {
+          "id": "increments",
+          "name": "string|required|min:2",
+          "description": "string:200|nullable",
+          "published": "bool|default:0"
+        },
+      }
+    }
+  },
+  "api": {
     "article": {
-      "fields": {
-        "id": "increments",
-        "name": "string|required|min:2",
-        "description": "string:200|nullable",
-        "published": "bool|default:0"
-      },
-      "api": {
-        "endpoint": "article",
-        "methods": ["GET", "POST", "PUT", "DELETE"]
+      "methods": {
+        "GET": true,
+        "POST": true,
+        "PUT": true,
+        "DELETE": true,
       }
     }
   }
@@ -121,13 +130,15 @@ Multiple fields for each table:
 
 ``` JSON
 {
-  "tables": {
-    "article": {
-      "fields": {
-        "id": "integer",
-        "name": "string",
-        "description": "string",
-        "content": "text"
+  "model": {
+    "tables": {
+      "article": {
+        "fields": {
+          "id": "integer",
+          "name": "string",
+          "description": "string",
+          "content": "text"
+        }
       }
     }
   }
@@ -140,13 +151,15 @@ Multiple options:
 
 ``` JSON
 {
-  "tables": {
-    "product": {
-      "fields": {
-        "id": "uuid|primary",
-        "name": "string|required",
-        "description": "text|nullable",
-        "quantity": "integer"
+  "model": {
+    "tables": {
+      "product": {
+        "fields": {
+          "id": "uuid|primary",
+          "name": "string|required",
+          "description": "text|nullable",
+          "quantity": "integer"
+        }
       }
     }
   }
@@ -233,17 +246,18 @@ Body:
 
 ## Field types
 
-| Type         | Description                          | Parameters
-| ------------ | ------------------------------------ | ---------------
-| string       | Just a string                        | optional length
-| text         | Long text                            |
-| int          | Integer                              |
-| bool         | Boolean                              |
-| float        | A float number                       |
-| uuid         | An UUID                              |
-| increments   | An incrementing integer              |
-| one-to-many  | A list of records from another table | Table, field
-| many-to-many | A list of records from another table | Table, field
+| Type         | Description                              | Parameters
+| ------------ | ---------------------------------------- | ---------------
+| string       | Just a string                            | optional length
+| text         | Long text                                |
+| int          | Integer                                  |
+| bool         | Boolean                                  |
+| float        | A float number                           |
+| uuid         | An UUID                                  |
+| increments   | An incrementing integer                  |
+| one-to-one   | Reference to a record from another table | Table, field
+| one-to-many  | Reference to records from another table  | Table, field
+| many-to-many | Reference to records from another table  | Table, field
 
 ### UUID
 
@@ -252,11 +266,11 @@ If the UUID field is not primary, on POST creation and PUT update, the API will 
 
 ### Increments
 
-@TODO
+@TODO documentation
 
 ### List
 
-@TODO
+@TODO documentation
 
 ## Other options
 
@@ -296,7 +310,7 @@ Return an error if the JSON don't have the correct type on POST creation and PUT
 
 ### One to many
 
-@TODO
+@TODO documentation
 
 ### Cascade
 
@@ -324,7 +338,7 @@ If a record from table order is deleted, the previous API config will:
 
 ### Endpoint
 
-@TODO
+@TODO documentation
 
 ### Fetch
 
@@ -444,11 +458,11 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ### Fetch POST and PUT option
 
-@TODO
+@TODO documentation
 
 ### Methods
 
-@TODO
+@TODO documentation
 
 ## What this API generator doesn't do
 
@@ -456,6 +470,18 @@ Be aware that the more you fetch records from other tables, the slower your API 
 - Change the path of generated files (models, controllers ...)
 
 ## TODO
+
+- Adding virtual and silent mode
+- Add test to run artisan command
+- Implement fk model field type
+- Add version match
+- Build controllers
+- Build Model
+- Build routes
+- Add tests to request API
+
+- Update DOC
+- Convert OpenAI yaml into Json file
 
 - Save and restore database in JSON files
 - Add an error on wrong api methods
@@ -465,6 +491,7 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ## DONE
 
+- Change Json structure to include model
 - Cascade deletion
 - Add field type json
 - Fix wrong fields on update and fillable

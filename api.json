@@ -1,15 +1,50 @@
 {
-  "tables": {
-    "article": {
-      "fields": {
-        "id": "uuid|primary",
-        "title": "string|min:2",
-        "content": "text|nullable",
-        "url": "string|nullable"
-      },
-      "api": {
-        "endpoint": "article",
-        "methods": ["GET", "POST", "PUT", "DELETE"]
+  "model": {
+    "tables": {
+      "test_types": {
+        "fields": {
+          "_uuid": "uuid",
+          "_string": "string",
+          "_text": "text",
+          "_int": "int",
+          "_integer": "integer",
+          "_float": "float",
+          "_date": "date",
+          "_datetime": "datetime",
+          "_increments": "increments",
+          "_file": "file",
+          "_booleam": "boolean",
+          "_bool": "bool",
+          "_json": "json"
+        }
+      }
+    }
+  },
+  "api": {
+    "prefix": "/api",
+    "paths": {
+      "/test/{id}": {
+        "GET": {
+          "tables": ["test_types"],
+          "filters": {
+            "_uuid": { "=": "{id}" }
+          },
+          "fields": {
+            "_uuid": true,
+            "_string": true,
+            "_text": true,
+            "_int": true,
+            "_integer": true,
+            "_float": true,
+            "_date": true,
+            "_datetime": true,
+            "_increments": true,
+            "_file": true,
+            "_booleam": true,
+            "_bool": true,
+            "_json": true
+          }
+        }
       }
     }
   }
