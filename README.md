@@ -8,7 +8,7 @@ Author: Thierry DE LAPEYRE
 
 - Generate tables migration files, controller files, model files and add the routes
 - One artisan command to generate everything with logs
-- All the Rest standard requests of REST: get list, get record, create, update, delete
+- All the standard REST requests: get list, get record, create, update, delete
 - Fetch the foreign table record or list of records linked to your table
 - Validate fields and return comprehensive errors
 - Separate the table constraints and sort the table creation to prevent migration errors
@@ -230,34 +230,31 @@ Body:
 
 ### Creating a record
 
-@TODO
+@TODO fill documentation
 
 ### Updating a record
 
-@TODO
+@TODO fill documentation
 
 ### Deleting a record
 
-@TODO
+@TODO fill documentation
 
 ### Errors
 
-@TODO
+@TODO fill documentation
 
 ## Field types
 
-| Type         | Description                              | Parameters
-| ------------ | ---------------------------------------- | ---------------
-| string       | Just a string                            | optional length
-| text         | Long text                                |
-| int          | Integer                                  |
-| bool         | Boolean                                  |
-| float        | A float number                           |
-| uuid         | An UUID                                  |
-| increments   | An incrementing integer                  |
-| one-to-one   | Reference to a record from another table | Table, field
-| one-to-many  | Reference to records from another table  | Table, field
-| many-to-many | Reference to records from another table  | Table, field
+| Type           | Description                              | Parameters
+| -------------- | ---------------------------------------- | ---------------
+| string         | Just a string                            | optional length
+| text           | Long text                                |
+| int / integer  | Integer                                  |
+| bool / boolean | Boolean                                  |
+| float          | A float number                           |
+| uuid           | An UUID                                  |
+| increments     | An incrementing integer                  |
 
 ### UUID
 
@@ -266,26 +263,30 @@ If the UUID field is not primary, on POST creation and PUT update, the API will 
 
 ### Increments
 
-@TODO documentation
+@TODO fill documentation
 
 ### List
 
-@TODO documentation
+@TODO fill documentation
 
 ## Other options
 
-| Option      | Description                                | Parameters
-| ----------- | ------------------------------------------ | -------------
-| max         | Check the maximum length                   | Length
-| min         | Check the minimum length                   | Length
-| type        | Check the type                             | Type
-| required    | Check if a value exists                    |
-| nullable    | Field value can be null and optional       |
-| default     | Set the default value                      | Value
-| defaultexp  | Set the default value as a SQL expression  | Value
-| primary     | Set the field as primary key               |
+| Option       | Description                                | Parameters
+| ------------ | ------------------------------------------ | -------------
+| max          | Check the maximum length / maximum number  | Length
+| min          | Check the minimum length / minimum number  | Length
+| type         | Check the type                             | Type
+| required     | Check if a value exists                    |
+| nullable     | Field value can be null and optional       |
+| default      | Set the default value                      | Value
+| defaultexp   | Set the default value as a SQL expression  | Value
+| primary      | Set the field as primary key               |
+| one-to-one   | Reference to a record from another table   | Table, field
+| one-to-many  | Reference to records from another table    | Table, field
+| many-to-many | Reference to records from another table    | Table, field
+
+From old version:
 | omit        | Don't return the field value in API        |
-| one-to-one  | Link the foreign key to another table      | table, field
 | as          | Return this field value with another name  |
 | cascade     | Delete record if foreign record is deleted | type
 
@@ -327,8 +328,7 @@ The cascade option must be puts in one-to-one or one-to-many fields.
   ...
 }
 ```
-
-If a record from table order is deleted, the previous API config will:
+With this API config, if a record from table order is deleted, the API will:
 
 - Delete a record from table product if order.product_id is set
 - Delete a list of records from table category if category records are linked to this order record
@@ -338,7 +338,7 @@ If a record from table order is deleted, the previous API config will:
 
 ### Endpoint
 
-@TODO documentation
+@TODO fill documentation
 
 ### Fetch
 
@@ -361,7 +361,7 @@ For example with this configuration:
       "fields": {
         "id": "increments",
         "name": "string|required|min:2",
-        "category_id": "integer|link:category:id|as:category",
+        "category_id": "integer|many-to-many:category:id|as:category",
         "websites": "list:website:article_id"
       },
       "api": {
@@ -471,8 +471,7 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ## TODO
 
-- Adding virtual and silent mode
-- Add test to run artisan command
+- Check if we should
 - Implement fk model field type
 - Add version match
 - Build controllers
@@ -491,6 +490,7 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ## DONE
 
+- Add test to run artisan command
 - Change Json structure to include model
 - Cascade deletion
 - Add field type json
@@ -503,3 +503,7 @@ Be aware that the more you fetch records from other tables, the slower your API 
 - Add where clause to one-to-many and one-to-one fields
 - Change migration, model, controller, api route path in config
 - Change namespace and class extends in config
+
+## JSON audit
+
+
