@@ -506,4 +506,19 @@ Be aware that the more you fetch records from other tables, the slower your API 
 
 ## JSON audit
 
-
+```
+model
+  tables
+    article
+      id      uuid, primary
+      title   string, min:2, length:256
+      author  uuid, link:author:id
+    author
+      id      uuid, primary
+      name    string
+api
+  GET /article
+    get
+      table   article
+      fields  [*, author]
+```
