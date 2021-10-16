@@ -15,12 +15,13 @@ describe("Run make:api", function() {
     const migrationFile = '../../../database/migrations/0000____create_test_test_table.php';
     const modelFile = '../../../app/TestTest.php';
     const controllerFile = '../../../app/http/Controllers/TestTestController.php';
-    const routeFile = '../../../app/http/Controllers/TestTestController.php';
 
     // Clean files
-    output = execSync("rm -fr " + migrationFile + " " + modelFile + " " + controllerFile + " " + routeFile, { timeout: 8000 }).toString();
+    output = execSync("rm -fr " + migrationFile + " " + modelFile + " " + controllerFile, { timeout: 8000 }).toString();
 
     it("Artisan list must work and have make:api in list", function() {
+        console.log('      php artisan list');
+
         let error = null;
         let output = "";
         try {
@@ -34,6 +35,8 @@ describe("Run make:api", function() {
     });
 
     it("Run with a file that does not exist returns error", function() {
+        console.log('      php artisan make:api ./vendor/grabmy/laravel-api-builder/does_not_exist.json');
+
         let error = null;
         let output = "";
         try {
@@ -47,6 +50,8 @@ describe("Run make:api", function() {
     });
 
     it("Run with an empty JSON file returns error", function() {
+        console.log('      php artisan make:api ./vendor/grabmy/laravel-api-builder/test/json/empty.json');
+
         let error = null;
         let output = "";
         try {
@@ -60,6 +65,8 @@ describe("Run make:api", function() {
     });
 
     it("Run with wrong version returns error", function() {
+        console.log('      php artisan make:api ./vendor/grabmy/laravel-api-builder/test/json/wrong_version.json');
+
         let error = null;
         let output = "";
         try {
@@ -73,6 +80,8 @@ describe("Run make:api", function() {
     });
 
     it("Run with no model returns warning", function() {
+        console.log('      php artisan make:api ./vendor/grabmy/laravel-api-builder/test/json/no_model.json');
+
         let error = null;
         let output = "";
         try {
@@ -85,11 +94,13 @@ describe("Run make:api", function() {
         expect(output).not.contain("No files generated due to errors");
     });
     
-    it("Make an API with all types: php artisan make:api ./vendor/grabmy/laravel-api-builder/test/json/types.json", function() {
+    it("Make a migration and model with all field types", function() {
+        console.log('      php artisan make:api ./vendor/grabmy/laravel-api-builder/test/json/model_types.json');
+
         let error = null;
         let output = "";
         try {
-            output = execSync("cd ../../../ && php artisan make:api ./vendor/grabmy/laravel-api-builder/test/json/types.json", { timeout: 8000 }).toString();
+            output = execSync("cd ../../../ && php artisan make:api ./vendor/grabmy/laravel-api-builder/test/json/model_types.json", { timeout: 8000 }).toString();
         } catch (e) {
             error = e;
         }
@@ -109,6 +120,9 @@ describe("Run make:api", function() {
         expect(error).to.be.null;
         expect(output).contain("No syntax errors detected");
         
+        // Controller must not exists
+        expect(fs.existsSync(controllerFile)).not.ok;
+
         // Validate model file
         error = null;
         expect(fs.existsSync(modelFile)).ok;
@@ -133,11 +147,9 @@ describe("Run make:api", function() {
         
         // Cleaning Database
         output = execSync("cd ../../../ && php artisan migrate:rollback", { timeout: 8000 }).toString();
-        console.log('Rollback:');
-        console.log(output);
 
         // Cleaning files
-        output = execSync("rm -fr " + migrationFile + " " + modelFile + " " + controllerFile + " " + routeFile, { timeout: 8000 }).toString();
+        output = execSync("rm -fr " + migrationFile + " " + modelFile + " " + controllerFile, { timeout: 8000 }).toString();
     });
     
 });
