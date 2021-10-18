@@ -25,6 +25,16 @@ class Builder extends BaseBuilder
   private $tables;
 
   /**
+   * API part of the json
+   */
+  private $api;
+
+  /**
+   * API part of the json
+   */
+  private $requests;
+
+  /**
    * Current version of the API
    */
   static private $version = "0.3";
@@ -104,7 +114,35 @@ class Builder extends BaseBuilder
     if (!isset($this->json['api'])) {
       $this->log('warning', 'No API loaded in JSON');
     } else {
+      $this->api = $this->json['api'];
 
+      if (!isset($this->api['requests']) == 0) {
+        $this->log('warning', 'No requests loaded in JSON');
+        return;
+      }
+  
+      if (count($this->model['tables']) > 1) {
+        $this->log('comment', 'Parsing '.count($this->model['tables']).' tables ...', 'v');
+      } else {
+        $this->log('comment', 'Parsing 1 table ...', 'v');
+      }
+  
+      $tableIndex = 0;
+      foreach ($this->model['tables'] as $tableName => $tableOptions) {
+        $this->log('comment', 'Parsing table "'.$tableName.'"', 'v');
+  
+        if (!isset($tableOptions['sort'])) {
+          $tableOptions['sort'] = $tableIndex + 1;
+        }
+  
+        $table = new BuilderTable($this->command, $tableName, $tableOptions);
+        if ($table->hasError()) {
+          $this->log('error', 'Table "'.$tableName.'" has errors');
+        } else {
+          $this->tables[$tableName] = $table;
+        }
+        $tableIndex++;
+      }
     }
   }
 

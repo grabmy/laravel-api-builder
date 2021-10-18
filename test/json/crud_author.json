@@ -1,0 +1,62 @@
+{
+  "version": "0.2.1",
+  "name": "Example API",
+  "description": "Full features demo",
+
+  "model": {
+    "table": {
+      "article": {
+        "fields": {
+          "id": "uuid|primary",
+          "text": "text",
+          "publish_date": "datetime",
+          "author_id": "uuid|fk:author:id"
+        }
+      },
+      "author": {
+        "fields": {
+          "id": "uuid|primary",
+          "name": "string"
+        }
+      }
+    }
+  },
+  
+  "api": {
+    "prefix": "/api",
+    "request": {
+      "GET /article/:id": {
+        "table": "article",
+        "action": "read",
+        "filter": {
+          "id": ":id"
+        },
+        "output": [
+          "*", ["author", "fetch-one:author_id"]
+        ]
+      },
+      "GET /article": {
+        "table": "article",
+        "action": "read",
+        "output": [
+          "*"
+        ]
+      },
+      "POST /article": {
+        "table": "article",
+        "output": [
+          "*"
+        ]
+      },
+      "PUT /article/:id": {
+        "table": "article",
+        "input": [
+          "*"
+        ],
+        "output": [
+          "*"
+        ]
+      }
+    }
+  }
+}

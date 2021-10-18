@@ -1,0 +1,30 @@
+{
+  "version": "0.3",
+  "name": "CRUD Article API",
+
+  "model": {
+    "tables": {
+      "article": {
+        "fields": {
+          "id": "uuid|primary",
+          "title": "string",
+          "text": "text",
+          "status": "string",
+          "publish_date": "datetime"
+        }
+      }
+    }
+  },
+  
+  "api": {
+    "prefix": "/api",
+    "crud-tables": {
+      "article": {
+        "GET": "read",
+        "PUT": "update",
+        "POST": "create",
+        "DELETE": "delete"
+      }
+    }
+  }
+}

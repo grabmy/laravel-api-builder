@@ -152,4 +152,64 @@ describe("Run make:api", function() {
         output = execSync("rm -fr " + migrationFile + " " + modelFile + " " + controllerFile, { timeout: 8000 }).toString();
     });
     
+    it("Make a CRUD API with table article", function() {
+        console.log('      php artisan make:api ./vendor/grabmy/laravel-api-builder/test/json/crud_article.json');
+
+        let error = null;
+        let output = "";
+        try {
+            output = execSync("cd ../../../ && php artisan make:api ./vendor/grabmy/laravel-api-builder/test/json/crud_article.json", { timeout: 8000 }).toString();
+        } catch (e) {
+            error = e;
+        }
+        expect(error).to.be.null;
+        expect(output).not.contain("Error");
+        expect(output).not.contain("errors");
+        expect(output).not.contain("No files generated due to errors");
+
+        // Validate migration file
+        error = null;
+        expect(fs.existsSync(migrationFile)).ok;
+        try {
+            output = execSync("php -l " + migrationFile, { timeout: 8000 }).toString();
+        } catch (e) {
+            error = e;
+        }
+        expect(error).to.be.null;
+        expect(output).contain("No syntax errors detected");
+        
+        // Controller must not exists
+        expect(fs.existsSync(controllerFile)).not.ok;
+
+        // Validate model file
+        error = null;
+        expect(fs.existsSync(modelFile)).ok;
+        try {
+            output = execSync("php -l " + modelFile, { timeout: 8000 }).toString();
+        } catch (e) {
+            error = e;
+        }
+        expect(error).to.be.null;
+        expect(output).contain("No syntax errors detected");
+        
+        // Execute migrate:fresh
+        error = null;
+        try {
+            output = execSync("cd ../../../ && php artisan migrate:fresh", { timeout: 8000 }).toString();
+        } catch (e) {
+            error = e;
+        }
+        expect(error).to.be.null;
+        expect(output).not.contain("error");
+        expect(output).not.contain("Error");
+        
+        // Test API
+        
+        // Cleaning Database
+        output = execSync("cd ../../../ && php artisan migrate:rollback", { timeout: 8000 }).toString();
+
+        // Cleaning files
+        output = execSync("rm -fr " + migrationFile + " " + modelFile + " " + controllerFile, { timeout: 8000 }).toString();
+    });
+    
 });

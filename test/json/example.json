@@ -5,7 +5,7 @@
 
   "model": {
     "tables": {
-      "types": {
+      "type": {
         "fields": {
           "_uuid": "uuid",
           "_string": "string",
@@ -52,7 +52,7 @@
     }
   },
   
-  "parameters": {
+  "variables": {
     "element_align": {
       "type": "string",
       "enum": ["left", "right", "center"]
@@ -66,45 +66,83 @@
 
   "api": {
     "prefix": "/api",
-    "paths": {
-      "/test/{_uuid}": {
-        "GET": {
-          "tables": ["test_types"],
-          "result": {
-            "_uuid": true,
-            "_string": true,
-            "_text": true,
-            "_int": true,
-            "_integer": true,
-            "_float": true,
-            "_date": true,
-            "_datetime": true,
-            "_increments": true,
-            "_file": true,
-            "_booleam": true,
-            "_bool": true,
-            "_json": true
-          }
-        }
-      },
-      "/test2/{id}": {
-        "GET": {
-          "tables": ["types"],
-          "validate": {
-            "id": "uuid"
-          },
-          "filters": [
-            {
-              "_uuid":
-              {
-                "eq": "{id}"
+    "crud-tables": {
+      "link": {
+        "GET": "read",
+        "PUT": "update",
+        "POST": "create",
+        "DELETE": "delete"
+      }
+    },
+
+    "requests": {
+      "request": {
+        "GET /type": {
+          "Description": "Get the list of types",
+          "table": "type",
+          "action": "read:list",
+          "output": ["*"],
+          "filter": {
+            "page": {
+              "current": "header:page-current",
+              "max": "header:page-max"
+            },
+            "fields": {
+              "_date": {
+                "gt": "header:field-date-start",
+                "lt": "header:field-date-end"
+              },
+              "_boolean": {
+                "eq": "header:field-boolean"
               }
             }
-          ],
-          "result": {
-            "_uuid": true,
-            "_string": true
           }
+        },
+        "GET /article/published": {
+          "table": "article",
+          "action": "read:list",
+          "filter": {
+            "field": {
+              "status": { "value": "published" }
+            }
+          },
+          "output": ["*"]
+        },
+        "GET /article/:id": {
+          "table": "article",
+          "action": "read",
+          "filter": {
+            "field": {
+              "id": ":id"
+            }
+          },
+          "output": {
+            "fields": ["*"]
+          }
+        },
+        "POST /article": {
+          "table": "article",
+          "action": "create",
+          "input": ["*"],
+          "output": ["*"]
+        },
+        "PUT /article/:id": {
+          "table": "article",
+          "action": "update:one",
+          "filter": {
+            "field": {
+              "id": ":id"
+            }
+          },
+          "input": ["*"]
+        },
+        "DELETE /article/:id": {
+          "table": "article",
+          "action": "delete",
+          "filter": {
+            "id": ":id"
+          },
+          "input": ["*"]
         }
       }
     }
